@@ -1,0 +1,20 @@
+{
+  "name": "simple.js",
+  "version": "0.1.0",
+  "description": "Simple JS for Comprehensive Apps",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://coreorm@bitbucket.org/coreorm/simple.js.git"
+  },
+  "keywords": [
+    "Simple",
+    "JS",
+    "App"
+  ],
+  "author": "Bruce B Li",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/coreorm/simple.js#readme"
+}
