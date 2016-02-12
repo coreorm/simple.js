@@ -28,3 +28,27 @@ Below are some advanced usage, not much, keep it simple, we shall.
 ### Partial rendering
 When app is configured to have `enablePartialRendering:true`, default rendering will look at the elements and run a simple logic:
 if state is updated on this element, the html will be re-rendered, otherwise, it will use the pre-rendered cache. 
+
+## Start Guide
+
+See dist/index.html for a working app example (and code is in page source)
+
+There are two ways to include the library:
+- use script tag to include the file;
+- put the script in HTML directly - the entire script is 4k, and by putting it in the HTML you save one extra connection - just download simple.min.js and put the content between `script` tags.
+ 
+## Create a new app
+```
+var name = 'my_app'; // only underscore and alphabets allowed, as these will be used for generating HTML ids
+var config = {
+  shouldSaveStateToLocalStorage: false,
+  shouldLoadStateFromLocalStorage: false,
+  enablePartialRendering: true
+};
+var myApp = new SimpleApp(name, config);
+
+// provide app templates
+myApp.elements = {
+  
+};
+```
