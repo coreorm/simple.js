@@ -40,6 +40,17 @@
       enablePartialRendering: true
     };
 
+    /**
+     * callback registry
+     * @type {{getElementStyle: {}}}
+     */
+    this.callback = {
+      getElementStyle: {},
+      renderElement: {},
+      parseElementData: {},
+      stateIsUpdated: {}
+    };
+
     // override with external config
     if (typeof config == 'object') {
       for (var k in config) {
@@ -54,10 +65,12 @@
     this.updateState = function (elementOrName, valueOrNull) {
       var name, value, element;
       if (typeof elementOrName == 'string') {
+        console.log('=> update state by name/value', elementOrName, valueOrNull);
         name = elementOrName;
         value = valueOrNull;
         this.state[elementOrName] = valueOrNull;
       } else if (typeof elementOrName == 'object' && typeof elementOrName.nodeName == 'string') {
+        console.log('=> update state by element', elementOrName);
         // must be object
         var el = elementOrName;
         var nodeName = el.nodeName;
@@ -102,10 +115,18 @@
       });
     };
     /**
-     * implement this yourself
+     * add callbacks to fire this for your own elements
+     * or even directly over-write this function
      * @param data
      */
     this.stateIsUpdated = function (data) {
+      // callback by name
+      console.log('state updated: ', data);
+      return data;
+      if (typeof this.callback.stateIsUpdated[data.name] == 'function') {
+        var c = this.callback.stateIsUpdated[data.name];
+        return c(data);
+      }
     };
     /**
      * template engine
@@ -176,15 +197,6 @@
         'default': ''
       },
       sub: {}
-    };
-    /**
-     * callback registry
-     * @type {{getElementStyle: {}}}
-     */
-    this.callback = {
-      getElementStyle: {},
-      renderElement: {},
-      parseElementData: {}
     };
     /**
      * callback: get element style
