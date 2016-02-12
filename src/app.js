@@ -4,6 +4,15 @@
  */
 (function (global) {
   'use strict';
+  var elementTemplateConfig = {
+    style: 'default',
+    data: {
+      name: 'value'
+    },
+    templates: {
+      'default': '<div>:name</div>'
+    }
+  };
   /**
    * app base class
    * @param name
@@ -15,6 +24,7 @@
     this.name = name;
     this.localStorageKey = prefix + '_data';
     this.container = null;
+    this.state = {};
 
     this.config = {
       shouldSaveStateToLocalStorage: false,
