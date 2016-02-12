@@ -1,24 +1,9 @@
 /**
  * simple app
+ * App base
  */
-'use strict';
-
 (function (global) {
-  /**
-   * template engine
-   * @param data
-   * @param template
-   * @returns {*}
-   */
-  function template(data, template) {
-    var output = template;
-    for (var n in data) {
-      var search = new RegExp(':' + n, 'g'), rep = data[n];
-      output = output.replace(search, rep);
-    }
-    return output;
-  }
-
+  'use strict';
   /**
    * app base class
    * @param name
@@ -45,28 +30,6 @@
     }
   };
   /**
-   * store state in local storage
-   */
-  app.store = function () {
-    if (this.config.shouldSaveStateToLocalStorage && typeof window.localStorage == 'object') {
-      window.localStorage.setItem(this.localStorageKey, JSON.stringify(this.state));
-    }
-  };
-  /**
-   * retrieve state from local storage
-   */
-  app.load = function () {
-    if (this.config.shouldLoadStateFromLocalStorage && typeof window.localStorage == 'object') {
-      var d = window.localStorage.getItem(this.localStorageKey);
-      if (!d) return;
-      try {
-        this.state = JSON.parse(d);
-      } catch (e) {
-        !window.console || console.log('Unable to parse state ' + d, e);
-      }
-    }
-  };
-  /**
    * update state of an element
    * @param elementOrName, if value presents and this param is string, this will be a direct update
    * @param valueOrNull optional, if the first param is element with value, it will use that
@@ -77,9 +40,9 @@
       name = elementOrName;
       value = valueOrNull;
       this.state[elementOrName] = valueOrNull;
-    } else if (typeof element == 'object' && typeof el.nodeName == 'string') {
+    } else if (typeof elementOrName == 'object' && typeof elementOrName.nodeName == 'string') {
       // must be object
-      var el = element;
+      var el = elementOrName;
       var nodeName = el.nodeName;
       var type = el.type;
       if (nodeName == 'SELECT') {
@@ -128,4 +91,44 @@
   app.stateIsUpdated = function (data) {
   };
 
+  // available on browser
+  global.SimpleApp = app;
+  /**
+   * template engine
+   * @param data
+   * @param template
+   * @returns {*}
+   */
+  app.template = function (data, template) {
+    var output = template;
+    for (var n in data) {
+      var search = new RegExp(':' + n, 'g'), rep = data[n];
+      output = output.replace(search, rep);
+    }
+    return output;
+  };
+  /**
+   * store state in local storage
+   */
+  app.store = function () {
+    if (this.config.shouldSaveStateToLocalStorage && typeof window.localStorage == 'object') {
+      window.localStorage.setItem(this.localStorageKey, JSON.stringify(this.state));
+    }
+  };
+  /**
+   * retrieve state from local storage
+   */
+  app.load = function () {
+    if (this.config.shouldLoadStateFromLocalStorage && typeof window.localStorage == 'object') {
+      var d = window.localStorage.getItem(this.localStorageKey);
+      if (!d) return;
+      try {
+        this.state = JSON.parse(d);
+      } catch (e) {
+        console.log('Unable to parse state ' + d, e);
+      }
+    }
+  };
+  // nodejs compatible
+  if (typeof exports != 'undefined') exports.SimpleApp = app;
 })(this);

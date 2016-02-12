@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "description": "Simple JS for Comprehensive Apps",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://coreorm@bitbucket.org/coreorm/simple.js.git"
+    "test": "echo '=> Test' && mocha",
+    "info": "echo 'Simple JS for Apps, supports defer/async and uses native JS with no external libs'",
+    "lint": "echo '=> JS Linkting' && jshint src/*.js",
+    "pretest": "npm run lint -s",
+    "build": "echo '=> Build All' && uglifyjs -c drop_console=true src/event.js src/app.js src/manager.js -o dist/simple.min.js",
+    "watch": "watch 'npm run build' src/"
   },
   "keywords": [
     "Simple",
@@ -16,5 +17,10 @@
   ],
   "author": "Bruce B Li",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/coreorm/simple.js#readme"
+  "devDependencies": {
+    "jshint": "^2.9.1",
+    "mocha": "^2.4.5",
+    "uglify-js": "^2.6.1",
+    "watch": "^0.17.1"
+  }
 }
