@@ -241,6 +241,7 @@
       for (var n in this.elements.template.sub) {
         d[n] = this.renderElement(n);
       }
+      d['__call'] = prefix + '.updateState';
       this.container.innerHTML = this.htmlTemplate(t, d);
       // make previous state the same as current now
       this.pState = JSON.parse(JSON.stringify(this.state));
