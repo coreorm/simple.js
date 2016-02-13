@@ -52,6 +52,11 @@
     }
   };
 
+  // capture sumbit in state update
+  app1.callback.stateIsUpdated['go'] = function () {
+    alert('current state: ' + app1.toQuerystring());
+  };
+
   // init app (and auto render)
   app1.init(document.getElementById('app1'), true);
 

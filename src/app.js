@@ -324,6 +324,19 @@
      */
     this.didRender = function () {
     };
+    /**
+     * export as querystring
+     */
+    this.toQuerystring = function () {
+      var qs = [];
+      for (var n in this.state) {
+        var v = this.state[n];
+        if (v) {
+          qs.push(n + '=' + v);
+        }
+      }
+      return qs.join('&');
+    }
   };
   /*------ export ------*/
   global.SimpleApp = app;
