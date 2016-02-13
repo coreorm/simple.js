@@ -2,9 +2,9 @@
  * Simple JS Manager
  * manages multiple apps and support async app creations (Using the event.js included)
  */
-(function (global) {
+(function (w) {
   'use strict';
-  global.SimpleAppManager = {
+  w.SimpleAppManager = {
     apps: {},
     /**
      * create a single app
@@ -13,7 +13,7 @@
      * @returns {SimpleApp}
      */
     create: function (name, config) {
-      var app = null;
+      var app;
       if (typeof this.apps[name] == 'object') {
         console.log('App ' + name + ' is in memory, use it now');
         app = this.apps[name];
@@ -29,5 +29,5 @@
     }
   };
   // nodejs compatible
-  if (typeof exports != 'undefined') exports.SimpleAppManager = global.SimpleAppManager;
+  if (typeof exports != 'undefined') exports.SimpleAppManager = w.SimpleAppManager;
 })(this);

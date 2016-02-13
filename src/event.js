@@ -4,13 +4,13 @@
 (function (global) {
   'use strict';
   global.SimpleEvent = {
-    eventCache: {}, listen: function (e, t) {
-      this.eventCache[e] = this.eventCache[e] || [];
-      this.eventCache[e].push(t);
+    c: {}, listen: function (e, t) {
+      this.c[e] = this.c[e] || [];
+      this.c[e].push(t);
     }, emit: function (e, t) {
-      if (this.eventCache[e] && this.eventCache[e].length > 0) {
-        for (var h in this.eventCache[e]) {
-          var n = this.eventCache[e][h];
+      if (this.c[e] && this.c[e].length > 0) {
+        for (var h in this.c[e]) {
+          var n = this.c[e][h];
           try {
             n(t);
           } catch (c) {

@@ -1,4 +1,27 @@
 /**
+ * event model to replace default event model (so IE will work too)
+ */
+(function (global) {
+  'use strict';
+  global.SimpleEvent = {
+    c: {}, listen: function (e, t) {
+      this.c[e] = this.c[e] || [];
+      this.c[e].push(t);
+    }, emit: function (e, t) {
+      if (this.c[e] && this.c[e].length > 0) {
+        for (var h in this.c[e]) {
+          var n = this.c[e][h];
+          try {
+            n(t);
+          } catch (c) {
+            console.log("Error", c);
+          }
+        }
+      }
+    }
+  };
+  if (typeof exports != 'undefined') exports.SimpleEvent = global.SimpleEvent;
+})(this);/**
  * simple app
  * App base
  */
@@ -345,4 +368,37 @@
   w.SimpleApp = app;
   // nodejs compatible
   if (typeof exports != 'undefined') exports.SimpleApp = app;
+})(this);
+/**
+ * Simple JS Manager
+ * manages multiple apps and support async app creations (Using the event.js included)
+ */
+(function (w) {
+  'use strict';
+  w.SimpleAppManager = {
+    apps: {},
+    /**
+     * create a single app
+     * @param name
+     * @param config | note: this is the system config
+     * @returns {SimpleApp}
+     */
+    create: function (name, config) {
+      var app;
+      if (typeof this.apps[name] == 'object') {
+        console.log('App ' + name + ' is in memory, use it now');
+        app = this.apps[name];
+      } else {
+        // create new app
+        app = new SimpleApp(name, config);
+        this.apps[name] = app;
+      }
+      return app;
+    },
+    getAppByName: function (name) {
+      return this.apps[name] || new SimpleApp(name);
+    }
+  };
+  // nodejs compatible
+  if (typeof exports != 'undefined') exports.SimpleAppManager = w.SimpleAppManager;
 })(this);

@@ -7,8 +7,8 @@
     "info": "echo 'Simple JS for Apps, supports defer/async and uses native JS with no external libs'",
     "lint": "echo '=> JS Linkting' && jshint src/*.js",
     "pretest": "npm run lint -s",
-    "build": "echo '=> Build All' && uglifyjs -c drop_console=true src/event.js src/app.js src/manager.js -o dist/simple.min.js",
-    "build:dev": "echo '=> Build All' && uglifyjs -c drop_console=false src/event.js src/app.js src/manager.js -o dist/simple.dev.min.js",
+    "build": "echo '=> Build All' && uglifyjs -c drop_console=true src/event.js src/app.js src/manager.js -o dist/simple.js && minify dist/simple.js && rm dist/simple.js",
+    "build:dev": "echo '=> Build Dev' && cat src/event.js src/app.js src/manager.js > dist/simple.dev.js && npm run build -s",
     "watch": "watch 'npm run build:dev' src/",
     "server": "http-server dist/"
   },
@@ -18,11 +18,12 @@
     "App"
   ],
   "author": "Bruce B Li",
-  "repository":"https://coreorm@bitbucket.org/coreorm/simple.js.git",
+  "repository": "https://coreorm@bitbucket.org/coreorm/simple.js.git",
   "license": "MIT",
   "devDependencies": {
     "http-server": "^0.8.5",
     "jshint": "^2.9.1",
+    "minifier": "^0.7.1",
     "mocha": "^2.4.5",
     "uglify-js": "^2.6.1",
     "watch": "^0.17.1"
