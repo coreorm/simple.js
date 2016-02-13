@@ -6,7 +6,7 @@
   var app1 = SimpleAppManager.create('app1');
 
   app1.elements.data = {
-    main: {h1: 'Example app'},
+    main: {hdr: 'Example app'},
     sub: {
       greeting: [{
         placeholder: 'enter greetings'
@@ -46,7 +46,7 @@
   };
 
   app1.elements.template.main = {
-    default: '<div class="container"><h1>:h1</h1><p>:title</p> <p> :name</p> <p>Age <select name="age" onchange=":__call(this)">:age</select></p> <p>:greeting</p>:go</div>'
+    default: '<div class="container"><h2>:hdr</h2><p>:title</p> <p> :name</p> <p>Age <select name="age" onchange=":__call(this)">:age</select></p> <p>:greeting</p>:go</div>'
   };
 
   var txtInput = '<label for="">:name<br> <input name=":name" onkeyup=":__call(this)" placeholder=":placeholder" value=":value" /></label>';

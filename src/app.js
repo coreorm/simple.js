@@ -16,13 +16,29 @@
     return hash;
   };
   /**
+   * string converter
+   * @param obj
+   * @private
+   */
+  var _s = function (obj) {
+    return JSON.stringify(obj);
+  };
+  /**
+   * obj copier
+   * @param obj
+   * @private
+   */
+  var _c = function (obj) {
+    return JSON.parse(JSON.stringify(obj));
+  };
+  /**
    * app base class
    * @param name
    * @param cnf
    */
   var app = function (name, cnf) {
     // defaults
-    name = JSON.stringify(name).hashCode();
+    name = _s(name).hashCode();
     var prefix = '__ss_app_' + name;
     this.name = name;
     // register app
@@ -137,20 +153,24 @@
      * @returns {*}
      */
     this.htmlTemplate = function (template, data) {
-      console.log('replacing template ' + template, 'with', data);
-      var output = template;
-      for (var n in data) {
-        var search = new RegExp(':' + n, 'g'), rep = data[n];
-        output = output.replace(search, rep);
+      try {
+        var output = template;
+        for (var n in data) {
+          var search = new RegExp(':' + n, 'g'), rep = data[n];
+          output = output.replace(search, rep);
+        }
+        return output;
+      } catch (e) {
+        console.log('[Error] html template failure', e);
+        return '';
       }
-      return output;
     };
     /**
      * store state in local storage
      */
     this.store = function () {
       if (this.cnf.localStorageWrite && typeof window.localStorage == 'object') {
-        window.localStorage.setItem(this.localStorageKey, JSON.stringify(this.state));
+        window.localStorage.setItem(this.localStorageKey, _s(this.state));
       }
     };
     /**
@@ -201,9 +221,8 @@
         return c(state, data);
       }
       if (state) {
-        var s = JSON.stringify(state);
-        var v = JSON.stringify(data['value']);
-        console.log('=> Element Style: compare state: ' + s + ' with value: ' + v);
+        var s = _s(state);
+        var v = _s(data['value']);
         return (s.indexOf(v) >= 0) ? 'selected' : 'default';
       }
       return 'default';
@@ -239,12 +258,17 @@
       var d = this.elements.data.main;
       if (!t) throw new Error('Invalid master template for style: ' + s);
       for (var n in this.elements.template.sub) {
-        d[n] = this.renderElement(n);
+        // partial if enabled
+        if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n]) && typeof d[n] == 'string') {
+          console.log('Partial rendering - render from cache for ' + n);
+        } else {
+          d[n] = this.renderElement(n);
+        }
       }
       d['__call'] = prefix + '.updateState';
       this.container.innerHTML = this.htmlTemplate(t, d);
       // make previous state the same as current now
-      this.pState = JSON.parse(JSON.stringify(this.state));
+      this.pState = _c(this.state);
       // finally, run did render
       this.didRender();
     };
@@ -261,7 +285,7 @@
       // now, find the 4 things: template, data, state, and style
       var data = this.elements.data.sub[elName] || {};
       var state = this.state[elName] || '';
-      console.log('=> Rendering ' + elName + ' with state: ', JSON.stringify(state));
+      console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
       if (typeof this.callback.renderElement[elName] == 'function') {
         var c = this.callback.renderElement[elName];
@@ -274,7 +298,7 @@
       var self = this;
       data.map(function (item) {
         // do not mute data item piece, so we do a safe copy
-        var d = JSON.parse(JSON.stringify(item));
+        var d = _c(item);
         var s = self.getElementStyle(elName, state, d);
         var t = self.elements.template.sub[elName][s];
         var data = self.parseElementData(elName, state, d);
@@ -285,7 +309,6 @@
         if (!data['value']) {
           data['value'] = state ? state : '';
         }
-        console.log('=> Data', data);
         if (!t) t = self.elements.template.sub[elName]['default'];
         output += self.htmlTemplate(t, data);
       });
