@@ -24,19 +24,6 @@
       }
       return app;
     },
-    /**
-     * run an existing app
-     * @param name
-     * @param container (optional) the main container for app to render, if not found, it will only excute main
-     */
-    run: function (name, container) {
-      if (typeof this.apps[name] != 'object') {
-        throw new Error('App ' + name + ' does not exist');
-      }
-      var app = this.apps[name];
-      app.container = container;
-      app.main();
-    },
     getAppByName: function (name) {
       return this.apps[name] || new SimpleApp(name);
     }
