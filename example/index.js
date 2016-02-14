@@ -7,7 +7,7 @@
   'user strict';
   var app = SimpleApp('static_index');
 
-  app.elements.data = {
+  app.data = {
     main: {},
     sub: {
       hdr: [{
@@ -34,11 +34,11 @@
     }
   };
 
-  app.elements.template.main = {
+  app.template.main = {
     default: '<div class="container">{hdr}<div class="row">{row}</div></div>'
   };
 
-  app.elements.template.sub = {
+  app.template.sub = {
     hdr: {
       default: '<div class="jumbotron"><h1>{title}</h1><p>{content}</p></div>'
     },

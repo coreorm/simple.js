@@ -5,7 +5,7 @@
   'user strict';
   var app = SimpleApp('app1');
 
-  app.elements.data = {
+  app.data = {
     main: {hdr: 'Example app'},
     sub: {
       greeting: [{
@@ -45,7 +45,7 @@
     }
   };
 
-  app.elements.template.main = {
+  app.template.main = {
     default: '<div class="container"><form><h2>{hdr}</h2><fieldset class="form-group">{title}</fieldset> ' +
     '<fieldset class="form-group"> {name}</fieldset>' +
     '<fieldset class="form-group">Age <select name="age" onchange="{__s}(this)">{age}</select></fieldset>' +
@@ -56,7 +56,7 @@
 
   var txtInput = '<label for="">{name}<br> <input name="{name}" onkeyup="{__s}(this)" placeholder="{placeholder}" value="{value}" /></label>';
 
-  app.elements.template.sub = {
+  app.template.sub = {
     go: {
       default: '<button type="button" class="button btn-primary" name="{name}" onclick="{__s}(this)">{caption}</button>'
     },

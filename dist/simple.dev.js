@@ -1,27 +1,4 @@
 /**
- * event model to replace default event model (so IE will work too)
- */
-(function (global) {
-  'use strict';
-  global.SimpleEvent = {
-    c: {}, listen: function (e, t) {
-      this.c[e] = this.c[e] || [];
-      this.c[e].push(t);
-    }, emit: function (e, t) {
-      if (this.c[e] && this.c[e].length > 0) {
-        for (var h in this.c[e]) {
-          var n = this.c[e][h];
-          try {
-            n(t);
-          } catch (c) {
-            console.log("Error", c);
-          }
-        }
-      }
-    }
-  };
-  if (typeof exports != 'undefined') exports.SimpleEvent = global.SimpleEvent;
-})(this);/**
  * simple app
  * App base
  */
@@ -111,7 +88,7 @@
       } else if (typeof elementOrName == 'object' && typeof elementOrName.nodeName == 'string') {
         console.log('=> update state by element', elementOrName);
         // must be object
-        var el = elementOrName;
+        el = elementOrName;
         var nodeName = el.nodeName;
         var type = el.type;
         if (nodeName == 'SELECT') {
@@ -212,21 +189,23 @@
     };
     /*------ elements cnf ------*/
     /**
-     * elements cnf
      * template: must have default template, or render will return empty string
      * if 'selected' template is available, when data fits in the current state, it will use selected state
      * within template, use
-     * :__ss for save state calls, e.g. :__ss('foo', 'bar') or :__ss(this) for elements
-     * pData: previous data (if nothing changes, will not render)
-     * data: current data (manipulatable)
-     * tempalte: templates
-     * @type {{data: {}, pData: {}, template: {}}}
+     * {__s} for save state calls, e.g. {__s}('foo', 'bar') or {__s}s(this) for elements
+     * @type {{main: {}, sub: {}}}
      */
-    this.elements = {
-      data: {},
-      pData: {},
-      template: {}
-    };
+    this.template = {main: {}, sub: {}};
+    /**
+     * data for elements
+     * @type {{main: {}, sub: {}}}
+     */
+    this.data = {main: {}, sub: {}};
+    /**
+     * previous data
+     * @type {{main: {}, sub: {}}}
+     */
+    this.pData = {main: {}, sub: {}};
     /**
      * callback: get element style
      * @param elName
@@ -241,7 +220,7 @@
       }
       if (state) {
         var s = _s(state);
-        var v = _s(data['value']);
+        var v = _s(data.value);
         return (s.indexOf(v) >= 0) ? 'selected' : 'default';
       }
       return 'default';
@@ -273,32 +252,33 @@
       console.log('=> Rendering Main Template');
       if (!this.container) throw new Error('Invalid container specified');
       var s = this.style;
-      var t = this.elements.template.main[s];
-      var d = this.elements.data.main;
+      var t = this.template.main[s];
+      var d = this.data.main;
       if (!t) throw new Error('Invalid master template for style: ' + s);
       var elementIsUpdated = false;
-      for (var n in this.elements.template.sub) {
+      for (var n in this.template.sub) {
         // partial if enabled
-        if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n]) && typeof d[n] == 'string') {
+        if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n])
+          && typeof d[n] == 'string' && _s(this.data.sub[n]) == _s(this.pData.sub[n])) {
           console.log('Partial rendering - render from cache for ' + n);
         } else {
           d[n] = this.renderElement(n);
-          var elementIsUpdated = true;
+          elementIsUpdated = true;
         }
       }
       // verify changes
-      if (!elementIsUpdated && _s(this.elements.data) == _s(this.elements.pData)) {
+      if (!elementIsUpdated && _s(this.data) == _s(this.pData)) {
         // nothing is really changed, DO NOT render again
         console.log('Data is unchanged, and no elements are changed, stop rendering');
         return;
       }
 
-      d['__s'] = prefix + '.updateState';
+      d.__s = prefix + '.updateState';
       this.container.innerHTML = this.htmlTemplate(t, d);
       // make previous state the same as current now
       this.pState = _c(this.state);
       // also make previous data the same as current data in elements
-      this.elements.pData = _c(this.elements.data);
+      this.pData = _c(this.data);
       // finally, run did render
       this.didRender();
     };
@@ -308,12 +288,12 @@
      * @returns {*}
      */
     this.renderElement = function (elName) {
-      if (typeof this.elements.template.sub[elName] != 'object') {
+      if (typeof this.template.sub[elName] != 'object') {
         console.log('[Warning] No element template found - return empty string');
         return '';
       }
       // now, find the 4 things: template, data, state, and style
-      var data = this.elements.data.sub[elName] || {};
+      var data = this.data.sub[elName] || {};
       var state = this.state[elName] || '';
       console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
@@ -330,16 +310,16 @@
         // do not mute data item piece, so we do a safe copy
         var d = _c(item);
         var s = self.getElementStyle(elName, state, d);
-        var t = self.elements.template.sub[elName][s];
+        var t = self.template.sub[elName][s];
         var data = self.parseElementData(elName, state, d);
         // update state interaction
-        data['__s'] = prefix + '.updateState';
-        data['name'] = elName;
+        data.__s = prefix + '.updateState';
+        data.name = elName;
         // get value from state if not present
-        if (!data['value']) {
-          data['value'] = state ? state : '';
+        if (!data.value) {
+          data.value = state ? state : '';
         }
-        if (!t) t = self.elements.template.sub[elName]['default'];
+        if (!t) t = self.template.sub[elName]['default'];
         output += self.htmlTemplate(t, data);
       });
       return output;
@@ -393,7 +373,7 @@
         }
       }
       return qs.join('&');
-    }
+    };
   };
   /*------ export ------*/
   var z = {};
@@ -407,6 +387,31 @@
     if (!z[name]) z[name] = new app(name, config);
     return z[name];
   };
+
+  /**
+   * Simple event listener
+   * @type {{c: {}, listen: Function, emit: Function}}
+   */
+  w.SimpleEvent = {
+    c: {}, listen: function (e, t) {
+      this.c[e] = this.c[e] || [];
+      this.c[e].push(t);
+    }, emit: function (e, t) {
+      if (this.c[e] && this.c[e].length > 0) {
+        for (var h in this.c[e]) {
+          var n = this.c[e][h];
+          try {
+            n(t);
+          } catch (c) {
+            console.log("Error", c);
+          }
+        }
+      }
+    }
+  };
   // nodejs compatible
-  if (typeof exports != 'undefined') exports.SimpleApp = w.SimpleApp;
+  if (typeof exports != 'undefined') {
+    exports.SimpleApp = w.SimpleApp;
+    exports.SimpleEvent = w.SimpleEvent;
+  }
 })(this);
