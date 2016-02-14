@@ -3,9 +3,9 @@
  */
 (function () {
   'user strict';
-  var app1 = SimpleAppManager.create('app1');
+  var app = SimpleApp('app1');
 
-  app1.elements.data = {
+  app.elements.data = {
     main: {hdr: 'Example app'},
     sub: {
       greeting: [{
@@ -45,7 +45,7 @@
     }
   };
 
-  app1.elements.template.main = {
+  app.elements.template.main = {
     default: '<div class="container"><form><h2>{hdr}</h2><fieldset class="form-group">{title}</fieldset> ' +
     '<fieldset class="form-group"> {name}</fieldset>' +
     '<fieldset class="form-group">Age <select name="age" onchange="{__s}(this)">{age}</select></fieldset>' +
@@ -56,13 +56,13 @@
 
   var txtInput = '<label for="">{name}<br> <input name="{name}" onkeyup="{__s}(this)" placeholder="{placeholder}" value="{value}" /></label>';
 
-  app1.elements.template.sub = {
+  app.elements.template.sub = {
     go: {
       default: '<button type="button" class="button btn-primary" name="{name}" onclick="{__s}(this)">{caption}</button>'
     },
     title: {
       default: '<label><input type="radio" name="{name}" onclick="{__s}(this)" value="{value}" /> {label}</label> ',
-      selected: '<label><input type="radio" name="{name}" value="{value}" checked="checked" /> {label}</label> '
+      selected: '<label><input type="radio" name="{name}" onclick="{__s}(this)" value="{value}" checked="checked" /> {label}</label> '
     },
     greeting: {
       default: txtInput
@@ -77,11 +77,29 @@
   };
 
   // capture sumbit in state update
-  app1.callback.stateIsUpdated['go'] = function () {
-    alert('current state: ' + app1.toQuerystring());
+  app.callback.stateIsUpdated['go'] = function () {
+    alert('current state: ' + app.toQuerystring());
   };
+  // update bg color with gender for fun
+  app.callback.stateIsUpdated['title'] = function (data) {
+    var color;
+    switch(data.value) {
+      case '1':
+        color = 'pink';
+        break;
+      case '2':
+        color = 'teal';
+        break;
+      default:
+        color = '#ccc';
+        break;
+    }
+    document.body.style.backgroundColor = color;
+
+  };
+  
 
   // init app (and auto render)
-  app1.init(document.getElementById('app1'), true);
+  app.init(document.getElementById('app1'), true);
 
 })();

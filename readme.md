@@ -31,24 +31,13 @@ if state is updated on this element, the html will be re-rendered, otherwise, it
 
 ## Start Guide
 
-See dist/index.html for a working app example (and code is in page source)
+See index.html for a working app example (and code is in page source)
 
 There are two ways to include the library:
 - use script tag to include the file;
 - put the script in HTML directly - the entire script is 4k, and by putting it in the HTML you save one extra connection - just download simple.min.js and put the content between `script` tags.
  
-## Create a new app
-```
-var name = 'my_app'; // only underscore and alphabets allowed, as these will be used for generating HTML ids
-var config = {
-  shouldSaveStateToLocalStorage: false,
-  shouldLoadStateFromLocalStorage: false,
-  enablePartialRendering: true
-};
-var myApp = new SimpleApp(name, config);
+## Create Apps
 
-// provide app templates
-myApp.elements = {
-  
-};
-```
+- See `example/index.js` for example of static app;
+- and `example/app1.js` for a basic dynamic form example 

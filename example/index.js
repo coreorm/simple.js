@@ -5,7 +5,7 @@
  */
 (function () {
   'user strict';
-  var app = SimpleAppManager.create('static_index');
+  var app = SimpleApp('static_index');
 
   app.elements.data = {
     main: {},

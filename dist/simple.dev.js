@@ -36,7 +36,7 @@
       hash = ((hash << 5) - hash) + chr;
       hash |= 0;
     }
-    return hash;
+    return Math.abs(hash);
   };
   /**
    * string converter
@@ -102,7 +102,7 @@
      * @param valueOrNull optional, if the first param is element with value, it will use that
      */
     this.updateState = function (elementOrName, valueOrNull) {
-      var name, value, element;
+      var name, value, el;
       if (typeof elementOrName == 'string') {
         console.log('=> update state by name/value', elementOrName, valueOrNull);
         name = elementOrName;
@@ -151,7 +151,7 @@
       this.stateIsUpdated({
         name: name,
         value: value,
-        element: element,
+        element: el,
         state: this.state
       });
     };
@@ -165,7 +165,7 @@
       console.log('state updated: ', data);
       if (typeof this.callback.stateIsUpdated[data.name] == 'function') {
         var c = this.callback.stateIsUpdated[data.name];
-        return c(data);
+        return _c(data);
       }
       return data;
     };
@@ -217,19 +217,15 @@
      * if 'selected' template is available, when data fits in the current state, it will use selected state
      * within template, use
      * :__ss for save state calls, e.g. :__ss('foo', 'bar') or :__ss(this) for elements
-     * @type {{data: {main: {}, sub: {}}, template: {main: {default: string}, sub: {}}}}
+     * pData: previous data (if nothing changes, will not render)
+     * data: current data (manipulatable)
+     * tempalte: templates
+     * @type {{data: {}, pData: {}, template: {}}}
      */
     this.elements = {
-      data: {
-        main: {},
-        sub: {}
-      },
-      template: {
-        main: {
-          'default': ''
-        },
-        sub: {}
-      }
+      data: {},
+      pData: {},
+      template: {}
     };
     /**
      * callback: get element style
@@ -241,7 +237,7 @@
       // check if callback is registered
       if (typeof this.callback.getElementStyle[elName] == 'function') {
         var c = this.callback.getElementStyle[elName];
-        return c(state, data);
+        return _c(state, data);
       }
       if (state) {
         var s = _s(state);
@@ -261,7 +257,7 @@
       // check if callback is registered
       if (typeof this.callback.parseElementData[elName] == 'function') {
         var c = this.callback.parseElementData[elName];
-        return c(state, data);
+        return _c(state, data);
       }
       // default
       return data;
@@ -280,18 +276,29 @@
       var t = this.elements.template.main[s];
       var d = this.elements.data.main;
       if (!t) throw new Error('Invalid master template for style: ' + s);
+      var elementIsUpdated = false;
       for (var n in this.elements.template.sub) {
         // partial if enabled
         if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n]) && typeof d[n] == 'string') {
           console.log('Partial rendering - render from cache for ' + n);
         } else {
           d[n] = this.renderElement(n);
+          var elementIsUpdated = true;
         }
       }
+      // verify changes
+      if (!elementIsUpdated && _s(this.elements.data) == _s(this.elements.pData)) {
+        // nothing is really changed, DO NOT render again
+        console.log('Data is unchanged, and no elements are changed, stop rendering');
+        return;
+      }
+
       d['__s'] = prefix + '.updateState';
       this.container.innerHTML = this.htmlTemplate(t, d);
       // make previous state the same as current now
       this.pState = _c(this.state);
+      // also make previous data the same as current data in elements
+      this.elements.pData = _c(this.elements.data);
       // finally, run did render
       this.didRender();
     };
@@ -312,7 +319,7 @@
       // if custom render function exists, use it.
       if (typeof this.callback.renderElement[elName] == 'function') {
         var c = this.callback.renderElement[elName];
-        return c(state, data);
+        return _c(state, data);
       }
       // otherwise, default
       var output = '';
@@ -389,40 +396,17 @@
     }
   };
   /*------ export ------*/
-  w.SimpleApp = app;
-  // nodejs compatible
-  if (typeof exports != 'undefined') exports.SimpleApp = app;
-})(this);
-/**
- * Simple JS Manager
- * manages multiple apps and support async app creations (Using the event.js included)
- */
-(function (w) {
-  'use strict';
-  w.SimpleAppManager = {
-    apps: {},
-    /**
-     * create a single app
-     * @param name
-     * @param config | note: this is the system config
-     * @returns {SimpleApp}
-     */
-    create: function (name, config) {
-      var app;
-      if (typeof this.apps[name] == 'object') {
-        console.log('App ' + name + ' is in memory, use it now');
-        app = this.apps[name];
-      } else {
-        // create new app
-        app = new SimpleApp(name, config);
-        this.apps[name] = app;
-      }
-      return app;
-    },
-    getAppByName: function (name) {
-      return this.apps[name] || new SimpleApp(name);
-    }
+  var z = {};
+  /**
+   * create / retrieve a single app
+   * @param name
+   * @param config | note: this is the system config
+   * @returns {SimpleApp}
+   */
+  w.SimpleApp = function (name, config) {
+    if (!z[name]) z[name] = new app(name, config);
+    return z[name];
   };
   // nodejs compatible
-  if (typeof exports != 'undefined') exports.SimpleAppManager = w.SimpleAppManager;
+  if (typeof exports != 'undefined') exports.SimpleApp = w.SimpleApp;
 })(this);
