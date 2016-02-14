@@ -82,6 +82,7 @@
   };
   // update bg color with gender for fun
   app.callback.stateIsUpdated['title'] = function (data) {
+    console.log('state of title updated to ', data);
     var color;
     switch(data.value) {
       case '1':
@@ -97,7 +98,7 @@
     document.body.style.backgroundColor = color;
 
   };
-  
+
 
   // init app (and auto render)
   app.init(document.getElementById('app1'), true);

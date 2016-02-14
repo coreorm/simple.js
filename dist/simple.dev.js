@@ -139,10 +139,9 @@
      */
     this.stateIsUpdated = function (data) {
       // callback by name
-      console.log('state updated: ', data);
       if (typeof this.callback.stateIsUpdated[data.name] == 'function') {
         var c = this.callback.stateIsUpdated[data.name];
-        return _c(data);
+        return c(data);
       }
       return data;
     };
