@@ -31,13 +31,13 @@
         {
           label: '0-19',
           value: 1
-        },{
+        }, {
           label: '20-39',
           value: 2
-        },{
+        }, {
           label: '40-59',
           value: 3
-        },{
+        }, {
           label: '60+',
           value: 4
         }
@@ -46,18 +46,23 @@
   };
 
   app1.elements.template.main = {
-    default: '<div class="container"><h2>:hdr</h2><p>:title</p> <p> :name</p> <p>Age <select name="age" onchange=":__call(this)">:age</select></p> <p>:greeting</p>:go</div>'
+    default: '<div class="container"><form><h2>{hdr}</h2><fieldset class="form-group">{title}</fieldset> ' +
+    '<fieldset class="form-group"> {name}</fieldset>' +
+    '<fieldset class="form-group">Age <select name="age" onchange="{__s}(this)">{age}</select></fieldset>' +
+    '<fieldset class="form-group">{greeting}</fieldset>' +
+    '<fieldset class="form-group">{go}</fieldset>' +
+    '</form></div>'
   };
 
-  var txtInput = '<label for="">:name<br> <input name=":name" onkeyup=":__call(this)" placeholder=":placeholder" value=":value" /></label>';
+  var txtInput = '<label for="">{name}<br> <input name="{name}" onkeyup="{__s}(this)" placeholder="{placeholder}" value="{value}" /></label>';
 
   app1.elements.template.sub = {
     go: {
-      default: '<button name=":name" onclick=":__call(this)">:caption</button>'
+      default: '<button type="button" class="button btn-primary" name="{name}" onclick="{__s}(this)">{caption}</button>'
     },
     title: {
-      default: '<div><label><input type="radio" name=":name" onclick=":__call(this)" value=":value" /> :label</label></div>',
-      selected: '<div><label><input type="radio" name=":name" value=":value" checked="checked" /> :label</label></div>'
+      default: '<label><input type="radio" name="{name}" onclick="{__s}(this)" value="{value}" /> {label}</label> ',
+      selected: '<label><input type="radio" name="{name}" value="{value}" checked="checked" /> {label}</label> '
     },
     greeting: {
       default: txtInput
@@ -66,8 +71,8 @@
       default: txtInput
     },
     age: {
-      default: '<option value=":value">:label</option>',
-      selected: '<option value=":value" selected="selected">:label</option>'
+      default: '<option value="{value}">{label}</option>',
+      selected: '<option value="{value}" selected="selected">{label}</option>'
     }
   };
 

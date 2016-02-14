@@ -10,7 +10,7 @@
     "build": "echo '=> Build All' && uglifyjs -c drop_console=true src/event.js src/app.js src/manager.js -o dist/simple.js && minify dist/simple.js && rm dist/simple.js",
     "build:dev": "echo '=> Build Dev' && cat src/event.js src/app.js src/manager.js > dist/simple.dev.js && npm run build -s",
     "watch": "watch 'npm run build:dev' src/",
-    "server": "http-server dist/"
+    "server": "http-server ./"
   },
   "keywords": [
     "Simple",

@@ -179,7 +179,7 @@
       try {
         var output = template;
         for (var n in data) {
-          var search = new RegExp(':' + n, 'g'), rep = data[n];
+          var search = new RegExp('{' + n + '}', 'g'), rep = data[n];
           output = output.replace(search, rep);
         }
         return output;
@@ -288,7 +288,7 @@
           d[n] = this.renderElement(n);
         }
       }
-      d['__call'] = prefix + '.updateState';
+      d['__s'] = prefix + '.updateState';
       this.container.innerHTML = this.htmlTemplate(t, d);
       // make previous state the same as current now
       this.pState = _c(this.state);
@@ -326,7 +326,7 @@
         var t = self.elements.template.sub[elName][s];
         var data = self.parseElementData(elName, state, d);
         // update state interaction
-        data['__call'] = prefix + '.updateState';
+        data['__s'] = prefix + '.updateState';
         data['name'] = elName;
         // get value from state if not present
         if (!data['value']) {
