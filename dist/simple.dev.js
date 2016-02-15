@@ -199,12 +199,17 @@
      * data for elements
      * @type {{main: {}, sub: {}}}
      */
-    this.data = {main: {}, sub: {}};
+    this.data = {};
     /**
      * previous data
      * @type {{main: {}, sub: {}}}
      */
-    this.pData = {main: {}, sub: {}};
+    this.pData = {};
+    /**
+     * elements cache
+     * @type {{}}
+     */
+    this.cache = {};
     /**
      * callback: get element style
      * @param elName
@@ -215,7 +220,7 @@
       // check if callback is registered
       if (typeof this.callback.getElementStyle[elName] == 'function') {
         var c = this.callback.getElementStyle[elName];
-        return _c(state, data);
+        return c(state, data);
       }
       if (state) {
         var s = _s(state);
@@ -224,25 +229,100 @@
       }
       return 'default';
     };
+    this.eId = function (elName) {
+      return prefix + '_el_' + elName;
+    };
     /**
      * callback: custom data parser
      * @param elName
      * @param state
      * @param data
-     * @returns {*}
+     * @param type
+     * @param subNodeCnt if > 0, it's a sub node
+     * @returns {{}}
      */
-    this.parseElementData = function (elName, state, data) {
+    this.parseElementData = function (elName, state, data, type, subNodeCnt) {
+      if (!data) data = {};
       // check if callback is registered
       if (typeof this.callback.parseElementData[elName] == 'function') {
         var c = this.callback.parseElementData[elName];
-        return _c(state, data);
+        data = c(state, data);
       }
-      // default
-      return data;
+      // prepare with attributes, allowed list (+ wildcar 'data-*', 'on*'):
+      var aa = ['accesskey', 'name', 'class', 'dir', 'id', 'lang', 'style', 'tabindex', 'title', 'src', 'type',
+        'placeholder', 'selected', 'checked', 'readonly', 'disabled', 'target', 'media', 'href', 'value'];
+      var d = {}, a = [];
+
+      data.name = elName;
+
+      if (subNodeCnt > 0) {
+        if (type != 'select') {
+          if (!data.id) data.id = this.eId(elName + '_' + subNodeCnt);
+        }
+      } else {
+        if (!data.id) data.id = this.eId(elName);
+      }
+      // generate on[change] by type
+      var act = prefix + '.updateState(this)';
+      if (!subNodeCnt) {
+        switch (type) {
+          case 'select':
+            data.onchange = act;
+            break;
+          case 'input':
+            data.onkeyup = act;
+            if (!data.value) {
+              data.value = state;
+            }
+            break;
+          default:
+            data.onclick = act;
+            break;
+        }
+      }
+      // select
+      if (subNodeCnt === true && _s(state).indexOf(_s(data.value)) >= 0) {
+        if (type == 'select' || type == 'radio') {
+          data.selected = 'selected';
+        }
+        if (type == 'checkbox') {
+          data.checked = 'checked';
+        }
+      }
+
+      for (var i in data) {
+        d[i] = data[i];
+        if (aa.indexOf(i) >= 0 || i.indexOf('data-') >= 0 || i.indexOf('on') >= 0) {
+          a.push(i + '="' + data[i] + '"');
+        }
+      }
+      d.attr = a.join(' ');
+      return d;
+    };
+    /**
+     * get element by name
+     * @param elName
+     * @returns {Element}
+     */
+    this.node = function (elName) {
+      return document.getElementById(this.eId(elName));
     };
     /*------ render ------*/
-    // main template style
+    /**
+     * main template style
+     * @type {string}
+     */
     this.style = 'default';
+    /**
+     * html to node
+     * @param src
+     * @returns {*}
+     */
+    this.h2n = function (src) {
+      var tmp = document.createElement('p');
+      tmp.innerHTML = src;
+      return tmp.childNodes[0];
+    };
     /**
      * render entire app
      */
@@ -252,32 +332,41 @@
       if (!this.container) throw new Error('Invalid container specified');
       var s = this.style;
       var t = this.template.main[s];
-      var d = this.data.main;
+      var d = this.cache;
       if (!t) throw new Error('Invalid master template for style: ' + s);
       var elementIsUpdated = false;
       for (var n in this.template.sub) {
         // partial if enabled
-        if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n])
-          && typeof d[n] == 'string' && _s(this.data.sub[n]) == _s(this.pData.sub[n])) {
-          console.log('Partial rendering - render from cache for ' + n);
+        if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n]) && typeof d[n] == 'string' && _s(this.data[n]) == _s(this.pData[n])) {
+          console.log('Partial rendering - render from cache for ' + n); // no need to set anything
         } else {
-          d[n] = this.renderElement(n);
-          elementIsUpdated = true;
+          var src = this.renderElement(n);
+          // here's the fun part - if obj is in there, do it!
+          var node = this.node(n);
+          if (node) {
+            if (src.length > 0) {
+              console.log('Node is available, replacing node [' + n + '] now with ' + src);
+              node.parentNode.replaceChild(this.h2n(d[n]), node);
+            } else {
+              console.log('Node has children, and will be replaced one by one');
+            }
+          } else {
+            d[n] = src;
+            elementIsUpdated = true;
+          }
         }
       }
-      // verify changes
-      if (!elementIsUpdated && _s(this.data) == _s(this.pData)) {
-        // nothing is really changed, DO NOT render again
-        console.log('Data is unchanged, and no elements are changed, stop rendering');
-        return;
-      }
-
-      d.__s = prefix + '.updateState';
-      this.container.innerHTML = this.htmlTemplate(t, d);
       // make previous state the same as current now
       this.pState = _c(this.state);
       // also make previous data the same as current data in elements
       this.pData = _c(this.data);
+      // verify changes
+      if (!elementIsUpdated) {
+        // nothing is really changed, DO NOT render again
+        console.log('Data is unchanged, and no elements are changed, stop rendering');
+        return;
+      }
+      this.container.innerHTML = this.htmlTemplate(t, d);
       // finally, run did render
       this.didRender();
     };
@@ -291,36 +380,59 @@
         console.log('[Warning] No element template found - return empty string');
         return '';
       }
-      // now, find the 4 things: template, data, state, and style
-      var data = this.data.sub[elName] || {};
+      // figure out the type (from template._type)
+      var data = this.data[elName] || {};
       var state = this.state[elName] || '';
       console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
       if (typeof this.callback.renderElement[elName] == 'function') {
         var c = this.callback.renderElement[elName];
-        return _c(state, data);
+        return c(state, data);
       }
-      // otherwise, default
-      var output = '';
-      // render as list, even when there's only 1 item (then just render 1)
-      // each item will have different styles by callback: this.getElementStyle(element, state, data);
+      // does it have a wrapper? if not, render as a single element
+      var t = this.template.sub[elName], type = t._type, output = '';
       var self = this;
-      data.map(function (item) {
-        // do not mute data item piece, so we do a safe copy
-        var d = _c(item);
-        var s = self.getElementStyle(elName, state, d);
-        var t = self.template.sub[elName][s];
-        var data = self.parseElementData(elName, state, d);
-        // update state interaction
-        data.__s = prefix + '.updateState';
-        data.name = elName;
-        // get value from state if not present
-        if (!data.value) {
-          data.value = state ? state : '';
+      if (t._wrapper) {
+        if (!data.wrapper) data.wrapper = {};
+        // render as wrapper
+        var wAttr = this.parseElementData(elName, state, data.wrapper, t._type);
+        // loop thru and do it
+        var elData = data.element || [];
+        // loop thru to get items rendered
+        var m = 0;
+        elData.map(function (item) {
+          m++;
+          var di = _c(item);
+          var si = self.getElementStyle(elName, state, di);
+          var ti = self.template.sub[elName][si];
+          var datai = self.parseElementData(elName, state, di, t._type, m);
+          if (!ti) ti = self.template.sub[elName]['default'];
+          // wait - do we have this sub node yet?
+          var snode = self.node(elName + '_' + m);
+          var nodeSrc = self.htmlTemplate(ti, datai);
+          // partial rendering
+          if (snode && self.cnf.partialRender) {
+            // verify if node needs to be re-rendered
+            var n = m - 1, before = _s(self.pData[elName].element[n]), after = _s(self.data[elName].element[n]);
+            if (before != after) {
+              console.log('node for element ' + elName + ':' + m + ' should be replaced');
+              snode.parentNode.replaceChild(self.h2n(nodeSrc), snode);
+            }
+          } else {
+            console.log('re-render the reset');
+            output += nodeSrc;
+          }
+        });
+        if (output.length > 1) {
+          output = self.htmlTemplate(t._wrapper[0], wAttr) + output + t._wrapper[1];
         }
-        if (!t) t = self.template.sub[elName]['default'];
-        output += self.htmlTemplate(t, data);
-      });
+      } else {
+        var si = this.getElementStyle(elName, state, data);
+        var ti = this.template.sub[elName][si];
+        var datai = this.parseElementData(elName, state, data, t._type);
+        if (!ti) ti = this.template.sub[elName]['default'];
+        output += this.htmlTemplate(ti, datai);
+      }
       return output;
     };
     /*------ init ------*/

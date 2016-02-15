@@ -4,17 +4,15 @@
  * static app example
  */
 (function () {
-  'user strict';
   var app = SimpleApp('static_index');
 
   app.data = {
-    main: {},
-    sub: {
-      hdr: [{
-        title: 'Welcome to Simple.JS',
-        content: 'Simple Web App Engine with no external dependencies'
-      }],
-      row: [
+    hdr: {
+      title: 'Welcome to Simple.JS',
+      content: 'Simple Web App Engine with no external dependencies'
+    },
+    row: {
+      element: [
         {
           title: 'Small and Nimble',
           content: 'The entire JS lib, before gzip, is 4k, you may well include it' +
@@ -35,15 +33,16 @@
   };
 
   app.template.main = {
-    default: '<div class="container">{hdr}<div class="row">{row}</div></div>'
+    default: '<div class="container">{hdr} {row}</div>'
   };
 
   app.template.sub = {
     hdr: {
-      default: '<div class="jumbotron"><h1>{title}</h1><p>{content}</p></div>'
+      default: '<div class="jumbotron" {attr}><h1>{title}</h1><p>{content}</p></div>'
     },
     row: {
-      default: '<div class="col-sm-4"><h3>{title}</h3><p>{content}</p></div>'
+      _wrapper: ['<div {attr}>', '</div>'],
+      default: '<div class="col-sm-4" {attr}><h3>{title}</h3><p>{content}</p></div>'
     }
   };
 

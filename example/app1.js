@@ -3,15 +3,12 @@
  */
 (function () {
   'user strict';
-  var app = SimpleApp('app1');
+  var app = SimpleApp('MyAwesomeApp');
 
   app.data = {
-    main: {hdr: 'Example app'},
-    sub: {
-      greeting: [{
-        placeholder: 'enter greetings'
-      }],
-      title: [{
+    // if type is wrapper
+    title: {
+      element: [{
         label: 'Mr.',
         value: 1
       }, {
@@ -20,71 +17,57 @@
       }, {
         label: 'Ms.',
         value: 3
-      }],
-      name: [{
-        placeholder: 'enter your name'
-      }],
-      go: [{
-        caption: 'Click to go'
-      }],
-      age: [
-        {
-          label: '0-19',
-          value: 1
-        }, {
-          label: '20-39',
-          value: 2
-        }, {
-          label: '40-59',
-          value: 3
-        }, {
-          label: '60+',
-          value: 4
-        }
-      ]
+      }]
+    },
+    name: {
+      placeholder: 'enter your name'
+    },
+    submit: {
+      type: 'button',
+      caption: 'Click to go'
     }
   };
 
+  // main template: the variables should be the sub elements only, main template does not carry data
   app.template.main = {
-    default: '<div class="container"><form><h2>{hdr}</h2><fieldset class="form-group">{title}</fieldset> ' +
-    '<fieldset class="form-group"> {name}</fieldset>' +
-    '<fieldset class="form-group">Age <select name="age" onchange="{__s}(this)">{age}</select></fieldset>' +
-    '<fieldset class="form-group">{greeting}</fieldset>' +
-    '<fieldset class="form-group">{go}</fieldset>' +
+    default: '<div class="container"><form>' +
+    '{title} {name} {submit}' +
     '</form></div>'
   };
 
-  var txtInput = '<label for="">{name}<br> <input name="{name}" onkeyup="{__s}(this)" placeholder="{placeholder}" value="{value}" /></label>';
-
+// sub template - note the 2 different types
   app.template.sub = {
-    go: {
-      default: '<button type="button" class="button btn-primary" name="{name}" onclick="{__s}(this)">{caption}</button>'
-    },
     title: {
-      default: '<label><input type="radio" name="{name}" onclick="{__s}(this)" value="{value}" /> {label}</label> ',
-      selected: '<label><input type="radio" name="{name}" onclick="{__s}(this)" value="{value}" checked="checked" /> {label}</label> '
-    },
-    greeting: {
-      default: txtInput
+      _type: 'select',
+      // special input such as SELECT can have a wrapper, or think <tr></tr>, etc.
+      _wrapper: ['<select {attr}>', '</select>'],
+      default: '<option {attr}>{label}</option>'
     },
     name: {
-      default: txtInput
+      // all text input are type: input
+      _type: 'input',
+      default: '<input type="text" {attr} />'
     },
-    age: {
-      default: '<option value="{value}">{label}</option>',
-      selected: '<option value="{value}" selected="selected">{label}</option>'
+    submit: {
+      _type: 'button',
+      default: '<button {attr}>{caption}</button>'
     }
   };
 
   // capture sumbit in state update
-  app.callback.stateIsUpdated['go'] = function () {
+  app.callback.stateIsUpdated['submit'] = function () {
     alert('current state: ' + app.toQuerystring());
   };
   // update bg color with gender for fun
   app.callback.stateIsUpdated['title'] = function (data) {
-    console.log('state of title updated to ', data);
-    var color;
-    switch(data.value) {
+    setColor(data.value);
+  };
+  app.appFinish = function () {
+    setColor(this.state.title);
+  };
+
+  function setColor(value) {
+    switch (value) {
       case '1':
         color = 'pink';
         break;
@@ -92,13 +75,11 @@
         color = 'teal';
         break;
       default:
-        color = '#ccc';
+        color = '';
         break;
     }
     document.body.style.backgroundColor = color;
-
-  };
-
+  }
 
   // init app (and auto render)
   app.init(document.getElementById('app1'), true);
