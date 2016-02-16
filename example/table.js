@@ -80,20 +80,27 @@
   // make rows the actual rows
   app.template.main.default = app.template.main.default.replace('{rows}', rs.join(''));
   // now, dynamically update text (or rather, entire td)
-  app.on('stateIsUpdated', 'td', function (data) {
+  app.on(SimpleAppStateIsUpdated, 'td', function (data) {
     // set value and render
     var r = 'row' + data.state.row;
     var c = data.state.col;
     try {
       if (typeof app.data[r].element[c] == 'object') {
         app.data[r].element[c].label = data.value;
+        app.data[r].element[c].style = 'background:yellow';
         app.renderElement(r);  // only render partial here
       }
     } catch (e) {
       console.log('[ERROR] ' + e);
     }
   });
+  // make apps show at the end
+  app.on(SimpleAppFinish, 'App-Visible', function () {
+    console.log('>> call: should make visible');
+    document.getElementById('apps').style.visibility = 'visible';
+  });
 
   app.init(document.getElementById('table'), true);
+
 
 })();

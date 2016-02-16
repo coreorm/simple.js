@@ -4,6 +4,19 @@
  */
 (function (w) {
   'use strict';
+
+  /**
+   * Events available
+   */
+  w.SimpleAppStart = 'sta',
+    w.SimpleAppFinish = 'fin',
+    w.SimpleAppWillRender = 'wrd',
+    w.SimpleAppDidRender = 'drd',
+    w.SimpleAppGetElementStyle = 'ges',
+    w.SimpleAppRenderElement = 'rde',
+    w.SimpleAppParseElementData = 'ped',
+    w.SimpleAppStateIsUpdated = 'siu';
+
   // lib
   String.prototype.hashCode = function () {
     var hash = 0, i, chr, len;
@@ -55,17 +68,44 @@
       localStorageRead: true,
       partialRender: true
     };
+    // override with external cnf
+    if (typeof cnf == 'object') {
+      for (var k in cnf) {
+        this.cnf[k] = cnf[k];
+      }
+    }
 
     /**
      * callback registry
      * @type {{getElementStyle: {}}}
      */
-    this.callback = {
-      getElementStyle: {},
-      renderElement: {},
-      parseElementData: {},
-      stateIsUpdated: {}
+    this.callbacks = {
+      sta: {},
+      fin: {},
+      wrd: {},
+      drd: {},
+      ges: {},
+      rde: {},
+      ped: {},
+      siu: {}
     };
+
+    /**
+     * get call by name and type
+     * @param type
+     * @param name
+     * @returns {*}
+     */
+    this.gc = function (type, name) {
+      if (name) {
+        if (typeof this.callbacks[type][name] == 'function') {
+          return this.callbacks[type][name];
+        }
+      } else {
+        return this.callbacks[type];
+      }
+    };
+
     /**
      * event triggers
      * @param type
@@ -73,16 +113,29 @@
      * @param callback
      */
     this.on = function (type, name, callback) {
-      if (typeof this.callback[type] == 'object') {
-        this.callback[type][name] = callback;
+      if (typeof this.callbacks[type] == 'object') {
+        if (typeof callback == 'function') {
+          this.callbacks[type][name] = callback;
+        }
       }
     };
-    // override with external cnf
-    if (typeof cnf == 'object') {
-      for (var k in cnf) {
-        this.cnf[k] = cnf[k];
+    /**
+     * fire events
+     * @param type
+     * @private
+     */
+    this._f = function (type) {
+      var calls = this.gc(type);
+      if (typeof calls == 'object') {
+        for (var k in calls) {
+          var call = calls[k];
+          if (typeof call == 'function') {
+            console.log('>> calls - ' + k, calls);
+            call();
+          }
+        }
       }
-    }
+    };
     /**
      * update state of an element
      * @param elementOrName, if value presents and this param is string, this will be a direct update
@@ -149,10 +202,8 @@
      */
     this.stateIsUpdated = function (data) {
       // callback by name
-      if (typeof this.callback.stateIsUpdated[data.name] == 'function') {
-        var c = this.callback.stateIsUpdated[data.name];
-        return c(data);
-      }
+      var c;
+      if (c = this.gc('siu', data.name)) return c(data);
       return data;
     };
     /**
@@ -230,10 +281,9 @@
      */
     this.getElementStyle = function (elName, state, data) {
       // check if callback is registered
-      if (typeof this.callback.getElementStyle[elName] == 'function') {
-        var c = this.callback.getElementStyle[elName];
-        return c(state, data);
-      }
+      var c;
+      if (c = this.gc('ges', elName)) return c(state, data);
+      // otherwise, default
       if (state) {
         var s = _s(state);
         var v = _s(data.value);
@@ -256,10 +306,8 @@
     this.parseElementData = function (elName, state, data, type, subNodeCnt) {
       if (!data) data = {};
       // check if callback is registered
-      if (typeof this.callback.parseElementData[elName] == 'function') {
-        var c = this.callback.parseElementData[elName];
-        data = c(state, data);
-      }
+      var c;
+      if (c = this.gc('ped', elName)) return c(state, data);
       // prepare with attributes, allowed list (+ wildcar 'data-*', 'on*'):
       var aa = ['accesskey', 'name', 'class', 'dir', 'id', 'lang', 'style', 'tabindex', 'title', 'src', 'type',
         'placeholder', 'selected', 'checked', 'readonly', 'disabled', 'target', 'media', 'href', 'value'];
@@ -346,7 +394,7 @@
      * render entire app
      */
     this.render = function () {
-      this.willRender();
+      this._f('wrd');
       console.log('=> Rendering Main Template For app: ' + this.name);
       if (!this.container) throw new Error('Invalid container specified');
       var s = this.style;
@@ -391,7 +439,7 @@
       console.log('Data is changed, rendering the whole thing');
       this.container.innerHTML = this.htmlTemplate(t, d);
       // finally, run did render
-      this.didRender();
+      this._f('drd');
       console.log('=> Finish Rendering');
     };
     /**
@@ -408,10 +456,8 @@
       var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
       console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
-      if (typeof this.callback.renderElement[elName] == 'function') {
-        var c = this.callback.renderElement[elName];
-        return c(state, data);
-      }
+      var c;
+      if (c = this.gc('rde', elName)) return c(state, data);
       // does it have a wrapper? if not, render as a single element
       var t = this.template.sub[elName], type = t._type;
       var self = this;
@@ -470,31 +516,11 @@
       this.load();
       if (autoRender === false) return;
       // next, render
-      this.appStart();
+      this._f('sta');
       this.render();
-      this.appFinish();
+      this._f('fin');
     };
-    /*------ app callbacks (to be implemented) ------*/
-    /**
-     * app start, only run once
-     */
-    this.appStart = function () {
-    };
-    /**
-     * app finish, only run once
-     */
-    this.appFinish = function () {
-    };
-    /**
-     * app will render, run each time before rendering
-     */
-    this.willRender = function () {
-    };
-    /**
-     * app finished rendering, run each time before rendering
-     */
-    this.didRender = function () {
-    };
+
     /**
      * export as querystring
      */
@@ -520,28 +546,6 @@
   w.SimpleApp = function (name, config) {
     if (!z[name]) z[name] = new app(name, config);
     return z[name];
-  };
-
-  /**
-   * Simple event listener
-   * @type {{c: {}, listen: Function, emit: Function}}
-   */
-  w.SimpleEvent = {
-    c: {}, listen: function (e, t) {
-      this.c[e] = this.c[e] || [];
-      this.c[e].push(t);
-    }, emit: function (e, t) {
-      if (this.c[e] && this.c[e].length > 0) {
-        for (var h in this.c[e]) {
-          var n = this.c[e][h];
-          try {
-            n(t);
-          } catch (c) {
-            console.log("Error", c);
-          }
-        }
-      }
-    }
   };
   // nodejs compatible
   if (typeof exports != 'undefined') {
