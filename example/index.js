@@ -39,12 +39,12 @@
   };
 
   app.template.main = {
-    default: '{hdr} <div class="clearfix">{row}</div> {welcome}'
+    default: '<div class="jumbotron" {attr}>{hdr}</div>{welcome}<div class="clearfix m-b-3">{row}</div>'
   };
 
   app.template.sub = {
     hdr: {
-      default: '<div class="jumbotron" {attr}><h1>{title}</h1> {content} {link} </div>'
+      default: '<div {attr}><h1>{title}</h1> {content} {link} </div>'
     },
     welcome: {
       default: '<div {attr}><div class="panel-heading"><strong>{title}</strong></div><div class="panel-body">{content}</div></div>',

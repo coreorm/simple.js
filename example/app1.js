@@ -2,12 +2,17 @@
  * example app
  */
 (function () {
-  var app = SimpleApp('app1');
+  var app = SimpleApp('app1', {
+    localStorageRead: false
+  });
 
   app.data = {
     // if type is wrapper
     bg: {
       element: [{
+        label: 'default',
+        value: '#FFF'
+      },{
         label: 'color 1',
         value: '#A59477'
       }, {
@@ -44,6 +49,9 @@
     }
   };
 
+  // initial state:
+  app.state.welcomeStyle = 'default';
+
   // main template: the variables should be the sub elements only, main template does not carry data
   app.template.main = {
     default: '<div class="container"><form>' +
@@ -56,7 +64,7 @@
     bg: {
       _type: 'select',
       // special input such as SELECT can have a wrapper, or think <tr></tr>, etc.
-      _wrapper: ['background: <select {attr}><option>-pick color-</option>', '</select>'],
+      _wrapper: ['background: <select {attr}>', '</select>'],
       default: '<option {attr}>{label}</option>'
     },
     welcomeStyle: {

@@ -23,4 +23,4 @@ function loadCss(src) {
 loadJs('index');
 loadJs('app1');
 loadJs('table');
-loadCss('paper');
+loadCss('metro');
