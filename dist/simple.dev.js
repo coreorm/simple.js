@@ -8,13 +8,13 @@
   /**
    * Events available
    */
-  w.SimpleAppStart = 'sta',
-    w.SimpleAppFinish = 'fin',
-    w.SimpleAppWillRender = 'wrd',
-    w.SimpleAppDidRender = 'drd',
-    w.SimpleAppRenderElement = 'rde',
-    w.SimpleAppParseElementData = 'ped',
-    w.SimpleAppStateIsUpdated = 'siu';
+  w.SimpleAppStart = 'sta';
+  w.SimpleAppFinish = 'fin';
+  w.SimpleAppWillRender = 'wrd';
+  w.SimpleAppDidRender = 'drd';
+  w.SimpleAppRenderElement = 'rde';
+  w.SimpleAppParseElementData = 'ped';
+  w.SimpleAppStateIsUpdated = 'siu';
 
   // lib
   String.prototype.hashCode = function () {
@@ -76,9 +76,9 @@
 
     /**
      * callback registry
-     * @type {{getElementStyle: {}}}
+     * @type {{els: {}}}
      */
-    this.callbacks = {
+    this.cr = {
       sta: {},
       fin: {},
       wrd: {},
@@ -96,11 +96,11 @@
      */
     this.gc = function (type, name) {
       if (name) {
-        if (typeof this.callbacks[type][name] == 'function') {
-          return this.callbacks[type][name];
+        if (typeof this.cr[type][name] == 'function') {
+          return this.cr[type][name];
         }
       } else {
-        return this.callbacks[type];
+        return this.cr[type];
       }
     };
 
@@ -111,9 +111,9 @@
      * @param callback
      */
     this.on = function (type, name, callback) {
-      if (typeof this.callbacks[type] == 'object') {
+      if (typeof this.cr[type] == 'object') {
         if (typeof callback == 'function') {
-          this.callbacks[type][name] = callback;
+          this.cr[type][name] = callback;
         }
       }
     };
@@ -194,7 +194,7 @@
       });
     };
     /**
-     * add callbacks to fire this for your own elements
+     * add cr to fire this for your own elements
      * or even directly over-write this function
      * @param data
      */
@@ -277,7 +277,7 @@
      * @param state
      * @param data
      */
-    this.getElementStyle = function (elName, state, data) {
+    this.els = function (elName, state, data) {
       // is there style in template setting already?
       if (data._style) {
         console.log('>>> Style for ' + elName + ': ' + data._style);
@@ -355,7 +355,7 @@
 
       for (var i in data) {
         d[i] = data[i];
-        if (aa.indexOf(i) >= 0 || i.indexOf('data-') >= 0 || i.indexOf('on') >= 0) {
+        if (aa.indexOf(i) >= 0 || i.indexOf('data-') == 0 || i.indexOf('on') == 0) {
           a.push(i + '="' + data[i] + '"');
         }
       }
@@ -478,7 +478,7 @@
         elData.map(function (item) {
           m++;
           var di = _c(item);
-          var si = self.getElementStyle(elName, state, di);
+          var si = self.els(elName, state, di);
           var ti = self.template.sub[elName][si];
           var datai = self.parseElementData(elName, state, di, t._type, m);
           if (!ti) ti = self.template.sub[elName]['default'];
@@ -506,7 +506,7 @@
           output = self.htmlTemplate(t._wrapper[0], wAttr) + output + t._wrapper[1];
         }
       } else {
-        var si = this.getElementStyle(elName, state, data);
+        var si = this.els(elName, state, data);
         var ti = this.template.sub[elName][si];
         var datai = this.parseElementData(elName, state, data, t._type);
         if (!ti) ti = this.template.sub[elName]['default'];
@@ -543,6 +543,21 @@
         }
       }
       return qs.join('&');
+    };
+    // apis for fast access over data
+    /**
+     * locate the current data object
+     * @param elName
+     * @param nodePosition
+     */
+    this.d = function (elName, nodePosition) {
+      if (!nodePosition) {
+        return this.data[elName];
+      }
+      if (typeof this.data[elName].element == 'object' &&
+        this.data[elName].element[nodePosition]) {
+        return this.data[elName].element[nodePosition];
+      }
     };
   };
   /*------ export ------*/

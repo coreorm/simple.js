@@ -2,7 +2,9 @@
  * table test with many, many fields
  */
 (function () {
-  var app = SimpleApp('table');
+  var app = SimpleApp('table', {
+    localStorageRead: false
+  });
   var tr = ['<tr {attr}>', '</tr>'];
   var td = '<td {attr}>{label}</td>';
   app.template = {
@@ -19,12 +21,12 @@
       // form
       row: {
         _type: 'select',
-        _wrapper: ['<select {attr}><option>row</option>', '</select>'],
+        _wrapper: ['<select {attr} style="width:50px;"><option>row</option>', '</select>'],
         default: '<option {attr}>{label}</option>'
       },
       col: {
         _type: 'select',
-        _wrapper: ['<select {attr}><option>col</option>', '</select>'],
+        _wrapper: ['<select {attr} style="width:50px;"><option>col</option>', '</select>'],
         default: '<option {attr}>{label}</option>'
       },
       td: {
@@ -86,8 +88,8 @@
     var c = data.state.col;
     try {
       if (typeof app.data[r].element[c] == 'object') {
-        app.data[r].element[c].label = data.value;
-        app.data[r].element[c].style = 'background:yellow';
+        app.d(r, c).label = data.value;
+        app.d(r, c).style = 'background:yellow';
         app.renderElement(r);  // only render partial here
       }
     } catch (e) {

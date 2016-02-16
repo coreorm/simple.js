@@ -9,13 +9,19 @@
     bg: {
       element: [{
         label: 'color 1',
-        value: 1
+        value: '#A59477'
       }, {
         label: 'color 2',
-        value: 2
+        value: '#f896d8'
       }, {
         label: 'color 3',
-        value: 3
+        value: '#CEBE98'
+      }, {
+        label: 'color 4',
+        value: '#CCC'
+      }, {
+        label: 'color 5',
+        value: '#DAEAC7'
       }]
     },
     welcomeStyle: {
@@ -55,7 +61,7 @@
     },
     welcomeStyle: {
       _type: 'radio',
-      _wrapper: ['', ''],
+      _wrapper: ['<span>render style: ', '</span>'],
       default: '<label id="{id}" style="margin-right:10px;"><input name="{name}" {selectState} value="{value}" ' +
       'type="radio" onclick="{action}"> {label} </label>'
     },
@@ -76,40 +82,22 @@
   });
   // update bg color with gender for fun
   app.on(SimpleAppStateIsUpdated, 'bg', function (data) {
-    setColor(data.value);
+    document.body.style.backgroundColor = app.state.bg;
   });
   // cross app interactions
   app.on(SimpleAppStateIsUpdated, 'welcomeText', function (data) {
-    console.log('update welcome', data.value);
     var OtherApp = SimpleApp('static_index');
-    OtherApp.data.welcome.content = data.value;
+    OtherApp.d('welcome').content = data.value;
     OtherApp.render();
   });
   app.on(SimpleAppStateIsUpdated, 'welcomeStyle', function (data) {
-    console.log('force render & update welcome style to ' + data.value);
     var OtherApp = SimpleApp('static_index');
-    OtherApp.data.welcome._style = data.value;
+    OtherApp.d('welcome')._style = data.value;
     OtherApp.render();
   });
   app.on(SimpleAppDidRender, 'defaultBG', function (data) {
-    console.log('>> call: should set color: ' + app.state.bg);
-    setColor(app.state.bg);
+    document.body.style.backgroundColor = app.state.bg;
   });
-
-  function setColor(value) {
-    switch (value) {
-      case '1':
-        color = '	#81c1e7';
-        break;
-      case '2':
-        color = '#c4dfe1';
-        break;
-      default:
-        color = '	#85a291';
-        break;
-    }
-    document.body.style.backgroundColor = color;
-  }
 
   // init app (and auto render)
   app.init(document.getElementById('app1'), true);
