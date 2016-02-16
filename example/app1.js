@@ -31,7 +31,7 @@
   app.template.main = {
     default: '<div class="container"><form>' +
     '{title} {name} {submit}' +
-    '</form></div>'
+    '</form></div><div class="clearfix"></div>'
   };
 
 // sub template - note the 2 different types

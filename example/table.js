@@ -7,52 +7,92 @@
   var td = '<td {attr}>{label}</td>';
   app.template = {
     main: {
-      default: '<p class="table-responsive container"><table class="table table-striped">{hdr}{row1}{row2}{row3}{row4}</table></p>'
+      default: '<div class="table-responsive">' +
+      '<table class="table table-striped">{hdr}{rows}</table>' +
+      '</div><form><label>row: {row}</label> <label>column: {col} </label> <label> value: {td}</label></form>'
     },
     sub: {
       hdr: {
         _wrapper: tr,
         default: '<th {attr}>{label}</th>'
       },
-      row1: {
-        _wrapper: tr,
-        default: td
+      // form
+      row: {
+        _type: 'select',
+        _wrapper: ['<select {attr}><option>row</option>', '</select>'],
+        default: '<option {attr}>{label}</option>'
       },
-      row2: {
-        _wrapper: tr,
-        default: td
+      col: {
+        _type: 'select',
+        _wrapper: ['<select {attr}><option>col</option>', '</select>'],
+        default: '<option {attr}>{label}</option>'
       },
-      row3: {
-        _wrapper: tr,
-        default: td
-      },
-      row4: {
-        _wrapper: tr,
-        default: td
+      td: {
+        _type: 'input',
+        default: '<input type="text" {attr}>'
       }
     }
   };
   // code some data out!!
-  var cols = 20;
+  var cols = 10, rows = 10;
   app.data = {
     hdr: {element: []},
-    row1: {element: []},
-    row2: {element: []},
-    row3: {element: []},
-    row4: {element: []},
-    row5: {element: []}
+    // form
+    row: {
+      element: []
+    },
+    col: {
+      element: []
+    },
+    td: {
+      placeholder: 'enter new value'
+    }
   };
+  var rs = [];
+  for (var m = 1; m <= rows; m++) {
+    rs.push('{row' + m + '}');
+    app.data.row.element.push({
+      value: m,
+      label: m
+    });
+    app.template.sub['row' + m] = {
+      _wrapper: tr,
+      default: td
+    };
+  }
+
   for (var i = 0; i <= cols; i++) {
     app.data.hdr.element.push({
       class: '',
-      label: 'hdr ' + i
+      label: i
     });
-    for (var m = 1; m <= 4; m++) {
+    app.data.col.element.push({
+      value: i,
+      label: i
+    });
+    for (var m = 1; m <= rows; m++) {
+      if (!app.data['row' + m]) app.data['row' + m] = {element: []};
       app.data['row' + m].element.push({
         label: m + '-' + i
       });
     }
   }
+  // make rows the actual rows
+  app.template.main.default = app.template.main.default.replace('{rows}', rs.join(''));
+  // now, dynamically update text (or rather, entire td)
+  app.on('stateIsUpdated', 'td', function (data) {
+    // set value and render
+    var r = 'row' + data.state.row;
+    var c = data.state.col;
+    try {
+      if (typeof app.data[r].element[c] == 'object') {
+        app.data[r].element[c].label = data.value;
+        app.renderElement(r);  // only render partial here
+      }
+    } catch (e) {
+      console.log('[ERROR] ' + e);
+    }
+  });
 
   app.init(document.getElementById('table'), true);
 

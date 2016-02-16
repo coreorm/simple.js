@@ -66,7 +66,17 @@
       parseElementData: {},
       stateIsUpdated: {}
     };
-
+    /**
+     * event triggers
+     * @param type
+     * @param name
+     * @param callback
+     */
+    this.on = function (type, name, callback) {
+      if (typeof this.callback[type] == 'object') {
+        this.callback[type][name] = callback;
+      }
+    };
     // override with external cnf
     if (typeof cnf == 'object') {
       for (var k in cnf) {
@@ -124,7 +134,7 @@
       }
       // save local if necessary
       this.store();
-      // callback
+      // notify callback
       this.stateIsUpdated({
         name: name,
         value: value,
@@ -155,8 +165,10 @@
       try {
         var output = template;
         for (var n in data) {
-          var search = new RegExp('{' + n + '}', 'g'), rep = data[n];
-          output = output.replace(search, rep);
+          if (n.length > 0) {
+            var search = new RegExp('{' + n + '}', 'g'), rep = data[n];
+            output = output.replace(search, rep);
+          }
         }
         return output;
       } catch (e) {
@@ -281,7 +293,8 @@
         }
       }
       // select
-      if (subNodeCnt === true && _s(state).indexOf(_s(data.value)) >= 0) {
+      if (subNodeCnt > 0 && _s(state).indexOf(_s(data.value)) >= 0) {
+        console.log('check select: ' + state + ' <> ' + data.value);
         if (type == 'select' || type == 'radio') {
           data.selected = 'selected';
         }
@@ -388,11 +401,11 @@
      */
     this.renderElement = function (elName) {
       if (typeof this.template.sub[elName] != 'object') {
-        console.log('[Warning] No element template found - return empty string');
+        console.log('[Warning] No element template found for ' + elName + ' - return empty string');
         return '';
       }
       // figure out the type (from template._type)
-      var data = this.data[elName] || {}, state = this.state[elName] || '';
+      var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
       console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
       if (typeof this.callback.renderElement[elName] == 'function') {
@@ -405,7 +418,7 @@
       if (t._wrapper) {
         if (!data.wrapper) data.wrapper = {};
         // render as wrapper
-        var wAttr = this.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = 0, output = '';
+        var wAttr = this.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = 0;
         elData.map(function (item) {
           m++;
           var di = _c(item);
@@ -423,8 +436,6 @@
             if (before != after) {
               console.log('=> Render: node for element:' + elName + '_' + m + ' should be replaced', snode, nodeSrc);
               self.h2n(nodeSrc, snode);
-              // then fix pData here too
-              self.pData[elName].element[n] = _c(self.data[elName].element[n]);
             } else {
               // same!
               console.log('node for element ' + elName + ':' + m + ' is unchanged, do not render');
@@ -437,8 +448,6 @@
         if (typeof output == 'string' && output.length > 1) {
           console.log('>>> ' + elName + ' output length is ' + output.length);
           output = self.htmlTemplate(t._wrapper[0], wAttr) + output + t._wrapper[1];
-        } else {
-          return '';
         }
       } else {
         var si = this.getElementStyle(elName, state, data);

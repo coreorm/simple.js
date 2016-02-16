@@ -8,10 +8,24 @@
     <script src="dist/simple.dev.js"></script>
 </head>
 <body>
+<div class="container">
+    <div id="index">
+        <script defer src="example/index.js"></script>
+    </div>
 
-<div id="index"><script defer src="example/index.js"></script></div>
-<div id="app1"><script defer src="example/app1.js"></script></div>
-<div id="table"><script defer src="example/table.js"></script></div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">Form Example</div>
+        <div id="app1" class="panel-body">
+            <script defer src="example/app1.js"></script>
+        </div>
+    </div>
 
+    <div class="panel panel-info">
+        <div class="panel-heading">Dynamic Table Example</div>
+        <div id="table" class="panel-body">
+            <script defer src="example/table.js"></script>
+        </div>
+    </div>
+</div>
 </body>
 </html>
