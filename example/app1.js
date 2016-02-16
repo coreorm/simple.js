@@ -2,7 +2,7 @@
  * example app
  */
 (function () {
-  var app = SimpleApp('MyAwesomeApp');
+  var app = SimpleApp('app1');
 
   app.data = {
     // if type is wrapper
@@ -18,19 +18,30 @@
         value: 3
       }]
     },
-    name: {
-      placeholder: 'update welcome'
+    welcomeStyle: {
+      element: [{
+        label: 'default',
+        value: 'default'
+      }, {
+        label: 'plain text',
+        value: 'plain'
+      }]
+    },
+    welcomeText: {
+      placeholder: 'update welcome message in the top section',
+      style: 'width:300px;'
     },
     submit: {
       type: 'button',
-      caption: 'update'
+      class: 'btn btn-primary',
+      caption: 'serialize state'
     }
   };
 
   // main template: the variables should be the sub elements only, main template does not carry data
   app.template.main = {
     default: '<div class="container"><form>' +
-    '{bg} {name} {submit}' +
+    '{bg} {welcomeStyle} {welcomeText} {submit}' +
     '</form></div><div class="clearfix"></div>'
   };
 
@@ -42,7 +53,13 @@
       _wrapper: ['background: <select {attr}><option>-pick color-</option>', '</select>'],
       default: '<option {attr}>{label}</option>'
     },
-    name: {
+    welcomeStyle: {
+      _type: 'radio',
+      _wrapper: ['', ''],
+      default: '<label id="{id}" style="margin-right:10px;"><input name="{name}" {selectState} value="{value}" ' +
+      'type="radio" onclick="{action}"> {label} </label>'
+    },
+    welcomeText: {
       // all text input are type: input
       _type: 'input',
       default: '<input type="text" {attr} />'
@@ -60,6 +77,19 @@
   // update bg color with gender for fun
   app.on(SimpleAppStateIsUpdated, 'bg', function (data) {
     setColor(data.value);
+  });
+  // cross app interactions
+  app.on(SimpleAppStateIsUpdated, 'welcomeText', function (data) {
+    console.log('update welcome', data.value);
+    var OtherApp = SimpleApp('static_index');
+    OtherApp.data.welcome.content = data.value;
+    OtherApp.render();
+  });
+  app.on(SimpleAppStateIsUpdated, 'welcomeStyle', function (data) {
+    console.log('force render & update welcome style to ' + data.value);
+    var OtherApp = SimpleApp('static_index');
+    OtherApp.data.welcome._style = data.value;
+    OtherApp.render();
   });
   app.on(SimpleAppDidRender, 'defaultBG', function (data) {
     console.log('>> call: should set color: ' + app.state.bg);

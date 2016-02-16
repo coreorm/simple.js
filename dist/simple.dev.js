@@ -12,7 +12,6 @@
     w.SimpleAppFinish = 'fin',
     w.SimpleAppWillRender = 'wrd',
     w.SimpleAppDidRender = 'drd',
-    w.SimpleAppGetElementStyle = 'ges',
     w.SimpleAppRenderElement = 'rde',
     w.SimpleAppParseElementData = 'ped',
     w.SimpleAppStateIsUpdated = 'siu';
@@ -84,7 +83,6 @@
       fin: {},
       wrd: {},
       drd: {},
-      ges: {},
       rde: {},
       ped: {},
       siu: {}
@@ -202,8 +200,8 @@
      */
     this.stateIsUpdated = function (data) {
       // callback by name
-      var c;
-      if (c = this.gc('siu', data.name)) return c(data);
+      var c = this.gc('siu', data.name);
+      if (typeof c == 'function') return c(data);
       return data;
     };
     /**
@@ -280,9 +278,11 @@
      * @param data
      */
     this.getElementStyle = function (elName, state, data) {
-      // check if callback is registered
-      var c;
-      if (c = this.gc('ges', elName)) return c(state, data);
+      // is there style in template setting already?
+      if (data._style) {
+        console.log('>>> Style for ' + elName + ': ' + data._style);
+        return data._style;
+      }
       // otherwise, default
       if (state) {
         var s = _s(state);
@@ -306,13 +306,12 @@
     this.parseElementData = function (elName, state, data, type, subNodeCnt) {
       if (!data) data = {};
       // check if callback is registered
-      var c;
-      if (c = this.gc('ped', elName)) return c(state, data);
+      var c = this.gc('ped', elName);
+      if (typeof c == 'function') return c(state, data);
       // prepare with attributes, allowed list (+ wildcar 'data-*', 'on*'):
       var aa = ['accesskey', 'name', 'class', 'dir', 'id', 'lang', 'style', 'tabindex', 'title', 'src', 'type',
         'placeholder', 'selected', 'checked', 'readonly', 'disabled', 'target', 'media', 'href', 'value'];
       var d = {}, a = [];
-
       data.name = elName;
 
       if (subNodeCnt > 0) {
@@ -340,14 +339,17 @@
             break;
         }
       }
+      d.selectState = '';
       // select
       if (subNodeCnt > 0 && _s(state).indexOf(_s(data.value)) >= 0) {
         console.log('check select: ' + state + ' <> ' + data.value);
-        if (type == 'select' || type == 'radio') {
+        if (type == 'select') {
           data.selected = 'selected';
+          d.selectState = 'selected="selected"';
         }
-        if (type == 'checkbox') {
+        if (type == 'checkbox' || type == 'radio') {
           data.checked = 'checked';
+          d.selectState = 'checked="checked"';
         }
       }
 
@@ -358,6 +360,8 @@
         }
       }
       d.attr = a.join(' ');
+      d.action = act;
+      if (elName == 'welcomeStyle') console.log('>>> parseElementData', d);
       return d;
     };
     /**
@@ -392,22 +396,26 @@
     };
     /**
      * render entire app
+     * @param forceRender if true, force a complete render
      */
-    this.render = function () {
+    this.render = function (forceRender) {
       this._f('wrd');
-      console.log('=> Rendering Main Template For app: ' + this.name);
+      forceRender = (forceRender === true);
+      console.log('=> Rendering Main Template For app: ' + this.name + ' should force render: ' + forceRender);
       if (!this.container) throw new Error('Invalid container specified');
       var s = this.style;
       var t = this.template.main[s];
       var d = this.cache;
       if (!t) throw new Error('Invalid master template for style: ' + s);
-      var elementIsUpdated = false;
+
+      var elUpdated = forceRender;
+
       for (var n in this.template.sub) {
         // partial if enabled
-        if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n]) && typeof d[n] == 'string' && _s(this.data[n]) == _s(this.pData[n])) {
+        if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n]) && typeof d[n] == 'string' && _s(this.data[n]) == _s(this.pData[n]) && !forceRender) {
           console.log('Partial rendering - render from cache for ' + n); // no need to set anything
         } else {
-          var src = this.renderElement(n);
+          var src = this.renderElement(n, forceRender);
           // here's the fun part - if obj is in there, do it!
           var node = this.node(n);
           if (node) {
@@ -421,7 +429,7 @@
               // this means it's fully rendered
               console.log('New Render Generated for ' + n);
               d[n] = src;
-              elementIsUpdated = true;
+              elUpdated = true;
             }
           }
         }
@@ -431,7 +439,7 @@
       // also make previous data the same as current data in elements
       this.pData = _c(this.data);
       // verify changes
-      if (!elementIsUpdated) {
+      if (!elUpdated) {
         // nothing is really changed, DO NOT render again
         console.log('Data is unchanged, and no elements are changed, stop rendering');
         return;
@@ -445,9 +453,11 @@
     /**
      * render single element
      * @param elName
+     * @param forceRender if true, for render without using node
      * @returns {*}
      */
-    this.renderElement = function (elName) {
+    this.renderElement = function (elName, forceRender) {
+      forceRender = (forceRender === true);
       if (typeof this.template.sub[elName] != 'object') {
         console.log('[Warning] No element template found for ' + elName + ' - return empty string');
         return '';
@@ -456,8 +466,8 @@
       var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
       console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
-      var c;
-      if (c = this.gc('rde', elName)) return c(state, data);
+      var c = this.gc('rde', elName);
+      if (typeof c == 'function') return c(state, data);
       // does it have a wrapper? if not, render as a single element
       var t = this.template.sub[elName], type = t._type;
       var self = this;
@@ -476,7 +486,7 @@
           var snode = self.node(elName + '_' + m);
           var nodeSrc = self.htmlTemplate(ti, datai);
           // partial rendering
-          if (snode && self.cnf.partialRender) {
+          if (snode && self.cnf.partialRender && !forceRender) {
             // verify if node needs to be re-rendered
             var n = m - 1, before = _s(self.pData[elName].element[n]), after = _s(self.data[elName].element[n]);
             if (before != after) {
@@ -552,4 +562,5 @@
     exports.SimpleApp = w.SimpleApp;
     exports.SimpleEvent = w.SimpleEvent;
   }
-})(this);
+})
+(this);

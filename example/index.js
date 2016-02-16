@@ -11,6 +11,11 @@
       title: 'Welcome to Simple.JS',
       content: 'Simple Web App Engine with no external dependencies'
     },
+    welcome: {
+      class: 'panel panel-default',
+      title: 'Cross App Interactions',
+      content: 'You can use the form (which is actually a different app) below to change the text of this line.'
+    },
     row: {
       element: [
         {
@@ -33,12 +38,16 @@
   };
 
   app.template.main = {
-    default: '<div class="container">{hdr} {row}</div>'
+    default: '<div class="container">{hdr} {welcome} {row}</div>'
   };
 
   app.template.sub = {
     hdr: {
       default: '<div class="jumbotron" {attr}><h1>{title}</h1><p>{content}</p></div>'
+    },
+    welcome: {
+      default: '<div {attr}><div class="panel-heading"><strong>{title}</strong></div><div class="panel-body">{content}</div></div>',
+      plain: '<div {attr}><h3>{title}</h3><p>{content}</p></div></div>'
     },
     row: {
       _wrapper: ['<div {attr}>', '</div>'],
