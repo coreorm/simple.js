@@ -2,7 +2,6 @@
  * example app
  */
 (function () {
-  'user strict';
   var app = SimpleApp('MyAwesomeApp');
 
   app.data = {

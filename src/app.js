@@ -39,7 +39,7 @@
   var app = function (name, cnf) {
     // defaults
     name = _s(name).hashCode();
-    var prefix = '__ss_app_' + name;
+    var prefix = '_sj_' + name;
     this.name = name;
     // register app
     w[prefix] = this;
@@ -276,7 +276,7 @@
             }
             break;
           default:
-            data.onclick = act;
+            if (type) data.onclick = act;
             break;
         }
       }
@@ -314,21 +314,27 @@
      */
     this.style = 'default';
     /**
-     * html to node
+     * html to node replace
      * @param src
+     * @param node must have node
      * @returns {*}
      */
-    this.h2n = function (src) {
-      var tmp = document.createElement('p');
-      tmp.innerHTML = src;
-      return tmp.childNodes[0];
+    this.h2n = function (src, node) {
+      // need parent, or kill
+      var p = node.parentElement;
+      if (p) {
+        var pn = p.cloneNode();
+        pn.innerHTML = src;
+        // replace now
+        p.replaceChild(pn.firstChild, node);
+      }
     };
     /**
      * render entire app
      */
     this.render = function () {
       this.willRender();
-      console.log('=> Rendering Main Template');
+      console.log('=> Rendering Main Template For app: ' + this.name);
       if (!this.container) throw new Error('Invalid container specified');
       var s = this.style;
       var t = this.template.main[s];
@@ -344,15 +350,18 @@
           // here's the fun part - if obj is in there, do it!
           var node = this.node(n);
           if (node) {
-            if (src.length > 0) {
-              console.log('Node is available, replacing node [' + n + '] now with ' + src);
-              node.parentNode.replaceChild(this.h2n(d[n]), node);
+            if (typeof src == 'string' && src.length > 0) {
+              this.h2n(src, node);
             } else {
               console.log('Node has children, and will be replaced one by one');
             }
           } else {
-            d[n] = src;
-            elementIsUpdated = true;
+            if (typeof src == 'string' && src.length > 0) {
+              // this means it's fully rendered
+              console.log('New Render Generated for ' + n);
+              d[n] = src;
+              elementIsUpdated = true;
+            }
           }
         }
       }
@@ -366,9 +375,11 @@
         console.log('Data is unchanged, and no elements are changed, stop rendering');
         return;
       }
+      console.log('Data is changed, rendering the whole thing');
       this.container.innerHTML = this.htmlTemplate(t, d);
       // finally, run did render
       this.didRender();
+      console.log('=> Finish Rendering');
     };
     /**
      * render single element
@@ -381,8 +392,7 @@
         return '';
       }
       // figure out the type (from template._type)
-      var data = this.data[elName] || {};
-      var state = this.state[elName] || '';
+      var data = this.data[elName] || {}, state = this.state[elName] || '';
       console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
       if (typeof this.callback.renderElement[elName] == 'function') {
@@ -390,16 +400,12 @@
         return c(state, data);
       }
       // does it have a wrapper? if not, render as a single element
-      var t = this.template.sub[elName], type = t._type, output = '';
+      var t = this.template.sub[elName], type = t._type;
       var self = this;
       if (t._wrapper) {
         if (!data.wrapper) data.wrapper = {};
         // render as wrapper
-        var wAttr = this.parseElementData(elName, state, data.wrapper, t._type);
-        // loop thru and do it
-        var elData = data.element || [];
-        // loop thru to get items rendered
-        var m = 0;
+        var wAttr = this.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = 0, output = '';
         elData.map(function (item) {
           m++;
           var di = _c(item);
@@ -415,16 +421,24 @@
             // verify if node needs to be re-rendered
             var n = m - 1, before = _s(self.pData[elName].element[n]), after = _s(self.data[elName].element[n]);
             if (before != after) {
-              console.log('node for element ' + elName + ':' + m + ' should be replaced');
-              snode.parentNode.replaceChild(self.h2n(nodeSrc), snode);
+              console.log('=> Render: node for element:' + elName + '_' + m + ' should be replaced', snode, nodeSrc);
+              self.h2n(nodeSrc, snode);
+              // then fix pData here too
+              self.pData[elName].element[n] = _c(self.data[elName].element[n]);
+            } else {
+              // same!
+              console.log('node for element ' + elName + ':' + m + ' is unchanged, do not render');
             }
           } else {
             console.log('re-render the reset');
             output += nodeSrc;
           }
         });
-        if (output.length > 1) {
+        if (typeof output == 'string' && output.length > 1) {
+          console.log('>>> ' + elName + ' output length is ' + output.length);
           output = self.htmlTemplate(t._wrapper[0], wAttr) + output + t._wrapper[1];
+        } else {
+          return '';
         }
       } else {
         var si = this.getElementStyle(elName, state, data);
