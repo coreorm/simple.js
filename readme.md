@@ -1,6 +1,6 @@
-# Component-based Simple JS App Framework
+# Component-based Simple JS App Lib
 
-Simple.js tries to solve only one thing: Dynamic View. And it requires no library at all (but you can use any library with it).
+Simple.js is not a framework like Angular, it's a native JS library that's small (less than 6K), and fast (avoid DOM operations whenever possible).
 
 ## What can you do with it?
 
@@ -9,86 +9,33 @@ Build web apps, but not just one app, it supports multiple apps co-existing with
 ## The Concept
 
 ### Simple idea:
-- One app holds its own state.
-- Each item in the state (should) belong to one element, well simple.js doesn't stop you from sharing states but better not.
-- User interactions (or programs) can update the state
-- When state is updated, `stateIsUpdated()` callback will be fired and custom codes can go in there, to trigger render/retrieve data/etc.
-
-## Advanced
-Below are some advanced usage, not much, keep it simple, we shall.
-
-### Partial rendering
-When app is configured to have `partialRender:true`, default rendering will look at the elements and run a simple logic:
-if state is updated on this element, the html will be re-rendered, otherwise, it will use the pre-rendered cache. 
-
-## Start Guide
-
-See index.html for a working app example (and code is in page source)
-
-There are two ways to include the library:
-- use script tag to include the file;
-- put the script in HTML directly - the entire script is 4k, and by putting it in the HTML you save one extra connection - just download simple.min.js and put the content between `script` tags.
- 
-# Create Apps
-
-### create new app
-API: `SimpleApp(name, config)`
-
-Example:
+* App is created via api `SimpleApp(name, config)`, e.g.
 ```
-(function () {
-  var app = SimpleApp('MyAwesomeApp', {
+var app = SimpleApp('my-app', {
     localStorageWrite: true,
     localStorageRead: true,
     partialRender: true
-  });
-})(); 
+});
 ```
-
-
-### Main/Sub elements
-- One app can only have a single *main* element, for instance, a form, or a content panel
-- One app can have as many sub elements as you want, and each of the sub element is rendered as a list, if there's a single element, it will be rendered as an array of 1 item only.
-e.g. checkboxes, select options, etc.
-- Each element may have 4 attributes:
--- state (as mentioned above)
--- style (NOT your css style, but the display style, think of it as way to pick the template)
--- data - JSON data that provides the src for rendering
--- template, the actual HTML template to render
-
-### render logic
-- initial render will be done in one step.
-- when DOM structure is finished, subsequent renders will be done separately to take advantage of targeted DOM operations
-- If partial render is enabled, and `{id}` fields are properly set, 
-
-### Template Guide:
-- Template Setup:
+* App has one main component, and a number of elements underneath
+* App.template keeps all templates for the app, it will have one `main` template, and numerous `sub` templates (elements)
+* App.state keeps the state of each element
+* App.data keeps all the data for each of the elements (NOTE: main template is just the layout, so there's no data necessary)
+* state will be updated via user interaction, or codes
+* whenever state is updated, a callback is fired and you may listen to the callback, e.g. 
 ```
-// main template: the variables should be the sub elements only, main template does not carry data
-app.template.main = {
-    default: '<div class="container"><form>' +
-             '{title} {name} {submit}'   
-             '</form></div>'
-};
-
-// sub template - note the 2 different types
-app.template.sub = {
-    title : {
-        _wrapper: ['<select name="{name}" onchange="{__s}(this)">', '</select>'],
-        default: '<option value="{value}">{label}</option>',
-        selected: '<option selected="selected" value="{value}">{label}</option>'
-    },
-    name : {
-        default: '<input type="text">'
-    }
-}
+// listen to input_name field changes
+app.on(SimpleAppStateIsUpdated, 'input_name', function (data) {
+    console.log('state is updated');
+});
 ```
-- use `{variable name}` syntax for variables
-- reserved placeholder: `{__s}` for current app's updateState method, e.g. `<input {attr}">`
-- make sure the template is wrapped in one unique tag, as this will be used as a *single node* for faster DOM operations later. e.g. `<div>foo</div>` instead of `<div>foo</div><span>bar</span>`
- NOTE to increase the performance, you must provide an id for each sub element, to do this:
-  -- DO NOT put `id="id"` fields in the template and system will generate an id for the current element, don't worry, if you need to target an element, you may still be able to use API: `SimpleApp('app-name').el('element-name')` to retrieve it.
+and this is where you may choose to excute your own codes, or re-render the view
 
-### reference
-- See `example/index.js` for example of static app;
-- and `example/app1.js` for a basic dynamic form example
+## Build guides
+- run `npm install` when you finish checking out the files
+- run `npm run` to see the available options, or just:
+- run `npm run watch` to watch the changes
+- run `npm run server` to start the web server so you may access a local `localhost:8080/dist/simple.dev.js`
+
+## Examples
+See http://coreorm.github.io/simple.js/ for complete guides and examples
