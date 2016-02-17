@@ -27,7 +27,7 @@ var hashIsChanged = function (hash) {
   } else {
     page = hash.replace('#', '');
   }
-  loadJs('/pages/' + page + '.js');
+  loadJs('pages/' + page + '.js');
 };
 // run initially
 hashIsChanged(window.location.hash);
