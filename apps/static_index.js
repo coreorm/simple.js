@@ -8,7 +8,7 @@
   app.data = {
     hdr: {
       title: 'Welcome to Simple.JS',
-      link: '<a title="source" href="/apps/static_index.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
+      link: '<a title="source" href="apps/static_index.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
       '<strong>&lt; src /&gt;</strong></a>',
       content: 'Simple Web App Engine with no external dependencies'
     },
