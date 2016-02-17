@@ -16,7 +16,7 @@ function loadJs(src) {
 function loadCss(src) {
   var s = document.createElement('link');
   s.setAttribute("rel", "stylesheet");
-  s.setAttribute("href", 'example/theme/' + src + '.css');
+  s.setAttribute("href", 'theme/' + src + '.css');
   document.head.appendChild(s);
 }
 
