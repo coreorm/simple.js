@@ -21,12 +21,12 @@
       // form
       row: {
         _type: 'select',
-        _wrapper: ['<select {attr} style="width:50px;"><option>row</option>', '</select>'],
+        _wrapper: ['<select {attr}><option>row</option>', '</select>'],
         default: '<option {attr}>{label}</option>'
       },
       col: {
         _type: 'select',
-        _wrapper: ['<select {attr} style="width:50px;"><option>col</option>', '</select>'],
+        _wrapper: ['<select {attr}><option>col</option>', '</select>'],
         default: '<option {attr}>{label}</option>'
       },
       td: {

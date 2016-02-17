@@ -70,7 +70,7 @@
     welcomeStyle: {
       _type: 'radio',
       _wrapper: ['<span>render style: ', '</span>'],
-      default: '<label id="{id}" style="margin-right:10px;"><input name="{name}" {selectState} value="{value}" ' +
+      default: '<label id="{id}" class="m-r-3"><input name="{name}" {selectState} value="{value}" ' +
       'type="radio" onclick="{action}"> {label} </label>'
     },
     welcomeText: {
