@@ -1,12 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Simple App Engine (Dev)</title>
-    <script src="js/simple.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple App Engine</title>
+  <script>
+    var loadedJS = {};
+    var loadedCSS = [];
+    function loadJs(src) {
+      if (!loadedJS[src]) {
+        var s = document.createElement('script');
+        s.setAttribute("type", "text/javascript");
+        s.setAttribute('defer', 'defer');
+        s.setAttribute("src", src);
+        document.head.appendChild(s);
+        loadedJS[src] = s;
+        console.log('script: ' + src + ' is loaded');
+      } else {
+        // remove it and load again
+        try {
+          console.log('remove already loaded script and reload');
+          document.head.removeChild(loadedJS[src]);
+          // then load again...
+          loadedJS[src] = null;
+          loadJs(src);
+        } catch (e) {
+          console.log('ERROR', e);
+        }
+      }
+    }
+    function loadCss(src) {
+      if (!loadedCSS[src]) {
+        var s = document.createElement('link');
+        s.setAttribute("rel", "stylesheet");
+        s.setAttribute("href", src);
+        document.head.appendChild(s);
+        loadedCSS[src] = s;
+        console.log('style: ' + src + ' is loaded');
+      }
+    }
+  </script>
 </head>
 <body>
-<div class="container" id="main"><script defer src="example/init.js"></script></div>
+<nav class="navbar navbar-inverse navbar-fixed-top" id="nav"></nav>
+<div class="container" id="apps"></div>
+<script defer src="js/jquery.js"></script>
+<script defer src="pages/init.js"></script>
+<script src="js/simple.min.js"></script>
 </body>
 </html>

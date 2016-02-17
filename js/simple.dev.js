@@ -304,6 +304,7 @@
      * @returns {{}}
      */
     this.parseElementData = function (elName, state, data, type, subNodeCnt) {
+      console.log(data);
       if (!data) data = {};
       // check if callback is registered
       var c = this.gc('ped', elName);
@@ -362,6 +363,7 @@
       d.attr = a.join(' ');
       d.action = act;
       if (elName == 'welcomeStyle') console.log('>>> parseElementData', d);
+      console.log('=> Data for ' + elName, d, data);
       return d;
     };
     /**

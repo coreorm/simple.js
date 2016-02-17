@@ -1,7 +1,6 @@
 /**
- * example app
  * index page
- * static app example
+ * top
  */
 (function () {
   var app = SimpleApp('static_index');
@@ -9,11 +8,12 @@
   app.data = {
     hdr: {
       title: 'Welcome to Simple.JS',
-      link: '<a title="source" href="example/index.js" target="_blank" class="pull-right">&lt; /&gt;</a>',
+      link: '<a title="source" href="/apps/static_index.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
+      '<strong>&lt; src /&gt;</strong></a>',
       content: 'Simple Web App Engine with no external dependencies'
     },
     welcome: {
-      class: 'panel panel-default',
+      class: 'panel panel-primary',
       title: 'Cross App Interactions',
       content: 'You can use the form (which is actually a different app) below to change the text of this line.'
     },
@@ -39,24 +39,24 @@
   };
 
   app.template.main = {
-    default: '<div class="jumbotron" {attr}>{hdr}</div>{welcome}<div class="clearfix m-b-3">{row}</div>'
+    default: '<div class="jumbotron">{hdr}</div>{welcome}<div class="clearfix m-b-3">{row}</div>'
   };
 
   app.template.sub = {
     hdr: {
-      default: '<div {attr}><h1>{title}</h1> {content} {link} </div>'
+      default: '<div {attr}><h1 class="page-header">{title}</h1> {content} {link} </div>'
     },
     welcome: {
       default: '<div {attr}><div class="panel-heading"><strong>{title}</strong></div><div class="panel-body">{content}</div></div>',
-      plain: '<div {attr}><h3>{title}</h3><p>{content}</p></div>'
+      plain: '<article id="{id}"><h3>{title}</h3><p>{content}</p></article>'
     },
     row: {
       _wrapper: ['<div {attr}>', '</div>'],
       default: '<div class="col-sm-4" {attr}><h3>{title}</h3><p>{content}</p></div>'
     }
   };
-
-  // init app (and auto render)
-  app.init(document.getElementById('index'), true);
-
+// init app
+  app.init(document.getElementById('index'), false);
+// force render
+  app.render(true);
 })();

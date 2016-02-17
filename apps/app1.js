@@ -7,12 +7,16 @@
   });
 
   app.data = {
-    // if type is wrapper
+    hdr:{
+      text: 'App2: Cross App Interaction',
+      link: '<a title="source" href="/apps/app1.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
+      '<strong>&lt; src /&gt;</strong></a>'
+    },
     bg: {
       element: [{
         label: 'default',
         value: '#FFF'
-      },{
+      }, {
         label: 'color 1',
         value: '#A59477'
       }, {
@@ -31,16 +35,17 @@
     },
     welcomeStyle: {
       element: [{
-        label: 'default',
+        label: 'default &nbsp;',
         value: 'default'
       }, {
-        label: 'plain text',
+        label: 'plain text ',
         value: 'plain'
       }]
     },
     welcomeText: {
       placeholder: 'update welcome message in the top section',
-      style: 'width:300px;'
+      style: 'width:90%;margin:4px 0;',
+      class: 'form-control'
     },
     submit: {
       type: 'button',
@@ -54,23 +59,29 @@
 
   // main template: the variables should be the sub elements only, main template does not carry data
   app.template.main = {
-    default: '<div class="container"><form>' +
+    default: '<div class="clearfix"></div>' +
+    '<div class="panel panel-primary">{hdr}' +
+    '<div class="panel-body">' +
+    '<div class="container"><form>' +
     '{bg} {welcomeStyle} {welcomeText} {submit}' +
-    '</form></div><div class="clearfix"></div>'
+    '</form></div></div>'
   };
 
 // sub template - note the 2 different types
   app.template.sub = {
+    hdr: {
+      default: '<div class="panel-heading" {attr}><label>{text}</label>{link}</div>'
+    },
     bg: {
       _type: 'select',
       // special input such as SELECT can have a wrapper, or think <tr></tr>, etc.
-      _wrapper: ['background: <select {attr}>', '</select>'],
+      _wrapper: ['<label>background: <select {attr}>', '</select></label>'],
       default: '<option {attr}>{label}</option>'
     },
     welcomeStyle: {
       _type: 'radio',
       _wrapper: ['<span>render style: ', '</span>'],
-      default: '<label id="{id}" class="m-r-3"><input name="{name}" {selectState} value="{value}" ' +
+      default: '<label id="{id}"><input name="{name}" {selectState} value="{value}" ' +
       'type="radio" onclick="{action}"> {label} </label>'
     },
     welcomeText: {
@@ -108,6 +119,7 @@
   });
 
   // init app (and auto render)
-  app.init(document.getElementById('app1'), true);
+  app.init(document.getElementById('app1'), false);
+  app.render(true);
 
 })();
