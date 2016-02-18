@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple App Engine W.I.P</title>
+  <script>
+    var loadedJS = {};
+    function loadJs(src, nodeName) {
+      event.preventDefault();
+      if (loadedJS[nodeName]) {
+        // remove existing one
+        try {
+          document.head.removeChild(loadedJS[nodeName]);
+        } catch (e) {
+          console.log('ERROR:', e);
+        }
+        loadedJS[nodeName] = null;
+      }
+      if (!loadedJS[src]) {
+        var s = document.createElement('script');
+        s.setAttribute("type", "text/javascript");
+        s.setAttribute('defer', 'defer');
+        s.setAttribute("src", src + '?' + (new Date().getTime() / 1000));
+        document.head.appendChild(s);
+        if (!nodeName) nodeName = src;
+        loadedJS[nodeName] = s;
+        console.log('script: ' + src + ' is loaded');
+      } else {
+        // remove it and load again
+        try {
+          console.log('remove already loaded script and reload');
+          document.head.removeChild(loadedJS[src]);
+          // then load again...
+          loadedJS[src] = null;
+          loadJs(src);
+        } catch (e) {
+          console.log('ERROR', e);
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="theme/yeti.css"/>
+</head>
+<body>
+<div class="navbar navbar-inverse">
+  <div class="container">
+    <ul class="nav navbar-nav">
+      <li><a href="#" onclick="loadJs('apps/noData.js', 'wip');">no data skip render</a></li>
+      <li><a href="#" onclick="loadJs('apps/noDataR.js', 'wip');">no data still render</a></li>
+    </ul>
+  </div>
+</div>
+<div class="container" id="apps"></div>
+<script src="../src/app.js"></script>
+</body>
+</html>
