@@ -7,14 +7,24 @@
   <script>
     var loadedJS = {};
     var loadedCSS = [];
-    function loadJs(src) {
+    function loadJs(src, nodeName) {
+      if (loadedJS[nodeName]) {
+        // remove existing one
+        try {
+          document.head.removeChild(loadedJS[nodeName]);
+        } catch (e) {
+          console.log('ERROR:', e);
+        }
+        loadedJS[nodeName] = null;
+      }
       if (!loadedJS[src]) {
         var s = document.createElement('script');
         s.setAttribute("type", "text/javascript");
         s.setAttribute('defer', 'defer');
         s.setAttribute("src", src);
         document.head.appendChild(s);
-        loadedJS[src] = s;
+        if (!nodeName) nodeName = src;
+        loadedJS[nodeName] = s;
         console.log('script: ' + src + ' is loaded');
       } else {
         // remove it and load again
@@ -39,13 +49,40 @@
         console.log('style: ' + src + ' is loaded');
       }
     }
+
+    // load page by hash
+    window.currentPage = '';
+    window.loadPage = function (hash) {
+      var page;
+      if (!hash) {
+        page = 'home';
+      } else {
+        page = hash.replace('#', '');
+      }
+      if (page == window.currentPage) {
+        return;
+      }
+      window.page = currentPage;
+      page = 'pages/' + page + '.js';
+      console.log('load page: ' + page);
+      loadJs(page, '_page');
+    };
+    // run initially
+    loadPage(window.location.hash);
   </script>
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top" id="nav"></nav>
 <div class="container" id="apps"></div>
-<script defer src="js/jquery.js"></script>
-<script defer src="pages/init.js"></script>
 <script src="js/simple.min.js"></script>
+<script defer src="js/jquery.js"></script>
+<script>
+  // default load
+  loadCss('theme/read.css');
+  // load nav and start
+  loadJs('apps/nav.js');
+  // bootstrap related
+  loadJs('js/bootstrap.min.js');
+</script>
 </body>
 </html>

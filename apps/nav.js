@@ -11,19 +11,24 @@
     links: {
       element: [
         {
-          href: '/',
+          href: '#home',
           label: 'home',
           title: 'Simple.Js'
         },
         {
-          href: '/#getting-started',
+          href: '#start',
           label: 'Getting Started',
           title: 'getting started'
         },
         {
-          href: '/#api-guide',
+          href: '#api-guide',
           label: 'API Guide',
           title: 'API Guide'
+        },
+        {
+          href: '#example',
+          label: 'Examples',
+          title: 'Code Examples'
         },
         {
           href: 'https://github.com/coreorm/simple.js',
@@ -49,10 +54,16 @@
       '</div>'
     },
     links: {
-      _wrapper: ['<div class="collapse navbar-collapse" id="menu"> <ul class="nav navbar-nav" {attr}>', '</ul></div>'],
-      default: '<li><a {attr}>{label}</a></li>'
+      _type: 'link',
+      _wrapper: ['<div class="collapse navbar-collapse" id="menu"> <ul class="nav navbar-nav" id="{id}">', '</ul></div>'],
+      default: '<li id="{id}"><a onclick="loadPage(\'{href}\')" href="{href}">{label}</a></li>'
     }
   };
+  // listen to link change
+  app.on(SimpleAppStateIsUpdated, 'load-page', function (data) {
+    var el = data.element;
+    alert(el);
+  });
 
   // init app (and auto render only for this one)
   app.init(document.getElementById('nav'), true);
