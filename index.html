@@ -140,7 +140,18 @@
 </script>
 <script src="js/jquery.js"></script>
 <script async src="js/bootstrap.min.js"></script>
+<script async src="js/micromarkdown.min.js"></script>
 <script async src="apps/nav.js"></script>
-<script>loadCss('theme/read.css');</script>
+<script>
+var cb = function() {
+  var l = document.createElement('link'); l.rel = 'stylesheet';
+  l.href = 'theme/read.css';
+  var h = document.getElementsByTagName('head')[0]; h.parentNode.insertBefore(l, h);
+};
+var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+  webkitRequestAnimationFrame || msRequestAnimationFrame;
+if (raf) raf(cb);
+else window.addEventListener('load', cb);
+</script>
 </body>
 </html>
