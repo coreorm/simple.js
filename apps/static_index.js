@@ -13,7 +13,7 @@
       content: 'Simple Web App Engine with no external dependencies'
     },
     welcome: {
-      class: 'panel panel-primary',
+      class: 'panel panel-' + window.defaultStyle,
       title: 'Cross App Interactions',
       content: 'You can use the form (which is actually a different app) below to change the text of this line.'
     },

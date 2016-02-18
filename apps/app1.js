@@ -7,7 +7,7 @@
   });
 
   app.data = {
-    hdr:{
+    hdr: {
       text: 'App2: Cross App Interaction',
       link: '<a title="source" href="apps/app1.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
       '<strong>&lt; src /&gt;</strong></a>'
@@ -49,7 +49,7 @@
     },
     submit: {
       type: 'button',
-      class: 'btn btn-primary',
+      class: 'btn btn-' + window.btnStyle,
       caption: 'serialize state'
     }
   };
@@ -60,7 +60,7 @@
   // main template: the variables should be the sub elements only, main template does not carry data
   app.template.main = {
     default: '<div class="clearfix"></div>' +
-    '<div class="panel panel-primary">{hdr}' +
+    '<div class="panel panel-' + window.defaultStyle + '">{hdr}' +
     '<div class="panel-body">' +
     '<div class="container"><form>' +
     '{bg} {welcomeStyle} {welcomeText} {submit}' +
@@ -97,7 +97,7 @@
 
   // capture sumbit in state update
   app.on(SimpleAppStateIsUpdated, 'submit', function () {
-    alert('current state: ' + app.toQuerystring());
+    modal('current state', app.toQuerystring());
   });
   // update bg color with gender for fun
   app.on(SimpleAppStateIsUpdated, 'bg', function (data) {
