@@ -5,6 +5,94 @@
 (function (w) {
   'use strict';
 
+  w.ms = function () {
+    return Date.now();
+  };
+
+  /**
+   * virtual node
+   * @param src
+   * @param parentNode
+   */
+  w.vNode = function (src, parentNode) {
+    this.src = src;
+    parentNode = parentNode || document.createElement('dive');
+    this.parent = parentNode;
+    try {
+      var n = this.parent.cloneNode(false);
+      n.innerHTML = this.src;
+      this.node = n.firstChild;
+    } catch (e) {
+      console.log('ERROR:', e);
+      return;
+    }
+    // apis
+    this.left = function (node, parent) {
+      var targ = node;
+      if (node instanceof vNode) targ = node.node;
+      if (parent) this.parent = parent;
+      try {
+        this.parent.insertBefore(this.node, targ);
+      } catch (e) {
+        console.log('ERROR: vNode.left()', e);
+      }
+    };
+    this.right = function (parent) {
+      try {
+        if (parent) this.parent = parent;
+        this.parent.appendChild(this.node);
+      } catch (e) {
+        console.log('ERROR: vNode.right()', e);
+      }
+    };
+    this.replace = function (node) {
+      var targ = node;
+      if (node instanceof vNode) targ = node.node;
+      try {
+        node.parent.replaceChild(targ, this.node);
+        this.parent = this.node.parentNode;
+      } catch (e) {
+        console.log('ERROR: vNode.replace()', e, node);
+      }
+    };
+    this.updateHTML = function (html) {
+      try {
+        var n = this.parent.cloneNode(false);
+        var oldNode = this.node;
+        n.innerHTML = html;
+        this.node = n.firstChild;
+        this.parent.replaceChild(this.node, oldNode);
+      } catch (e) {
+        console.log('ERROR: vNode.updateHTML()', htm, e);
+      }
+    };
+    this.appendVNode = function (vNode) {
+      this.node.appendChild(vNode.node);
+    };
+    this.appendVNodes = function (vNodes) {
+      var self = this;
+      try {
+        vNodes.map(function (el) {
+          self.node.appendChild(el.node);
+        });
+      } catch (e) {
+        console.log('ERROR: vNode.appendVNodes()', e);
+      }
+    };
+    this.remove = function () {
+      this.node.remove();
+    };
+  };
+
+  /**
+   * document.getElementById
+   * @param id
+   * @returns {*}
+   */
+  function d2e(id) {
+    return document.getElementById(id);
+  }
+
   /**
    * Events available
    */
@@ -372,7 +460,7 @@
      * @returns {Element}
      */
     this.node = function (elName) {
-      return document.getElementById(this.eId(elName));
+      return d2e(this.eId(elName));
     };
     /*------ render ------*/
     /**
