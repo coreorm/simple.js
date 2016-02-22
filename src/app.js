@@ -487,6 +487,33 @@
     /**
      * render entire app
      * @param forceRender if true, force a complete render
+     *
+     * RUN LOGIC:
+     * 1. data changed for el?
+     *  1.1 is it a wrapper type?
+     *    YES: go to 1.2
+     *    NO:
+     *      1.1.0 is the vNode non-existent?
+     *        YES: new vNode()
+     *        NO: is the template style changed?
+     *          YES: new vNode
+     *          NO: go to next
+     *      1.1.1 is the data empty?
+     *        YES: vNode.remove()
+     *        NO: vNode.updateHTML()
+     *  1.2 yes it's a wrapper
+     *    1.2.0 is vNode non-existent?
+     *      YES: new vNode plus children
+     *      NO: go to next
+     *    1.2.1 loop thru children:
+     *      with each child:
+     *      new data count > old data count?
+     *      YES:
+     *        vNode exists?
+     *          YES: vNode.updateHTML() - no need to remove anything (so order doesn't really matter)
+     *          NO: new vNode, vNode.right(parent);
+     *     NO:
+     *        count vNode and remove ones that are not in vNode.remove()
      */
     this.render = function (forceRender) {
       this._f('wrd');
