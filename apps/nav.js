@@ -31,6 +31,11 @@
           title: 'Code Examples'
         },
         {
+          href: '#design-doc',
+          label: 'Design Docs',
+          title: 'Design Docs'
+        },
+        {
           href: 'https://github.com/coreorm/simple.js',
           label: 'github',
           title: 'github'

@@ -120,6 +120,7 @@
     // load page by hash
     window.currentPage = '';
     window.loadPage = function (hash) {
+      if (!hash) hash = (location.href.split("#")[1] || null);
       var page;
       if (!hash) {
         page = 'home';
@@ -135,7 +136,7 @@
       loadJs(page, '_page');
     };
     // run initially
-    loadPage(window.location.hash);
+    loadPage();
     // modal
     function modal(t, b) {
       if (t) $('.modal-title').html(t);
@@ -144,6 +145,14 @@
     }
   </script>
   <link href="theme/blog.css" rel="stylesheet" />
+  <style>
+    @media (min-width: 980px) {
+      body {
+        padding-top: 60px;
+        padding-bottom: 42px;
+      }
+    }
+  </style>
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top" id="nav"></nav>

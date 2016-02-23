@@ -48,7 +48,8 @@
    * @param name
    * @param cnf
    */
-  var app = function (name, cnf) {
+  var app;
+  app = function (name, cnf) {
     // defaults
     name = _s(name).hashCode();
     var prefix = '_sj_' + name;
@@ -65,7 +66,8 @@
     this.cnf = {
       localStorageWrite: true,
       localStorageRead: true,
-      partialRender: true
+      partialRender: true,
+      skipEmptyData: true // if true, skip the template when data is empty
     };
     // override with external cnf
     if (typeof cnf == 'object') {
@@ -416,20 +418,25 @@
           console.log('Partial rendering - render from cache for ' + n); // no need to set anything
         } else {
           var src = this.renderElement(n, forceRender);
-          // here's the fun part - if obj is in there, do it!
-          var node = this.node(n);
-          if (node) {
-            if (typeof src == 'string' && src.length > 0) {
-              this.h2n(src, node);
-            } else {
-              console.log('Node has children, and will be replaced one by one');
-            }
+          // if it's false, it's empty
+          if (src === false) {
+            d[n] = '';
           } else {
-            if (typeof src == 'string' && src.length > 0) {
-              // this means it's fully rendered
-              console.log('New Render Generated for ' + n);
-              d[n] = src;
-              elUpdated = true;
+            // here's the fun part - if obj is in there, do it!
+            var node = this.node(n);
+            if (node) {
+              if (typeof src == 'string' && src.length > 0) {
+                this.h2n(src, node);
+              } else {
+                console.log('Node has children, and will be replaced one by one');
+              }
+            } else {
+              if (typeof src == 'string' && src.length > 0) {
+                // this means it's fully rendered
+                console.log('New Render Generated for ' + n);
+                d[n] = src;
+                elUpdated = true;
+              }
             }
           }
         }
@@ -445,7 +452,8 @@
         return;
       }
       console.log('Data is changed, rendering the whole thing');
-      this.container.innerHTML = this.htmlTemplate(t, d);
+      // this would replace all {xxx} stuff - so use skip {>name} if you want to display {name}
+      this.container.innerHTML = this.htmlTemplate(t, d).replace(/{[^<>}]+}/ig, '').replace(/{>([^}]+)}/ig, '{$1}');
       // finally, run did render
       this._f('drd');
       console.log('=> Finish Rendering');
@@ -460,10 +468,14 @@
       forceRender = (forceRender === true);
       if (typeof this.template.sub[elName] != 'object') {
         console.log('[Warning] No element template found for ' + elName + ' - return empty string');
-        return '';
+        return false;
       }
       // figure out the type (from template._type)
       var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
+      if (Object.keys(data).length == 0 && this.cnf.skipEmptyData === true) {
+        console.log('Empty Data, skipping rendering, also this.cnf', this.cnf);
+        return false;
+      }
       console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
       var c = this.gc('rde', elName);
