@@ -7,7 +7,7 @@
   <script>
     var loadedJS = {};
     function loadJs(src, nodeName) {
-      event.preventDefault();
+      if (event) event.preventDefault();
       if (loadedJS[nodeName]) {
         // remove existing one
         try {
@@ -48,10 +48,15 @@
     <ul class="nav navbar-nav">
       <li><a href="#" onclick="loadJs('apps/noData.js', 'wip');">no data skip render</a></li>
       <li><a href="#" onclick="loadJs('apps/noDataR.js', 'wip');">no data still render</a></li>
+      <li><a href="#" onclick="loadJs('apps/table.js', 'wip');">table example</a></li>
     </ul>
   </div>
 </div>
 <div class="container" id="apps"></div>
 <script src="../src/app.js"></script>
+<script>
+  // default load
+  loadJs('apps/table.js', 'wip');
+</script>
 </body>
 </html>
