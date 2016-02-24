@@ -8,8 +8,8 @@
 
   app.data = {
     hdr: {
-      text: 'App2: Cross App Interaction',
-      link: '<a title="source" href="apps/app1.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
+      _text: 'App2: Cross App Interaction',
+      _link: '<a title="source" href="apps/app1.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
       '<strong>&lt; src /&gt;</strong></a>'
     },
     bg: {
@@ -70,7 +70,7 @@
 // sub template - note the 2 different types
   app.template.sub = {
     hdr: {
-      default: '<div class="panel-heading" {attr}><label>{text}</label>{link}</div>'
+      default: '<div class="panel-heading" {attr}><label>{_text}</label>{_link}</div>'
     },
     bg: {
       _type: 'select',
@@ -106,7 +106,7 @@
   // cross app interactions
   app.on(SimpleAppStateIsUpdated, 'welcomeText', function (data) {
     var OtherApp = SimpleApp('static_index');
-    OtherApp.d('welcome').content = data.value;
+    OtherApp.d('welcome')._content = data.value;
     OtherApp.render();
   });
   app.on(SimpleAppStateIsUpdated, 'welcomeStyle', function (data) {
