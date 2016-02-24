@@ -544,6 +544,7 @@
      *        count vNode and remove ones that are not in vNode.remove()
      */
     this.render = function (full) {
+      var stime = ms();
       console.log('=> Start Rendering ' + this.aName);
       this._f('wrd');
       if (!this.container) throw new Error('Invalid container specified');
@@ -578,7 +579,7 @@
       this.pData = _c(this.data);
       // callback
       this._f('drd');
-      console.log('=> Finish Rendering');
+      console.log('=> Finish Rendering in ' + (ms() - stime) + ' ms');
     };
     /**
      * render single element
@@ -610,7 +611,6 @@
       if (typeof c == 'function') return c(state, data);
       // is data changed? if not, do not render (when partial)
       if (_s(this.data[elName]) == _s(this.pData[elName])) {
-        console.log('nothing changed, skip rendering');
         return false;
       }
 
@@ -651,18 +651,15 @@
           // retreive node
           // 1st. if not partial, or force render, keep adding to it
           if (self.cnf.partialRender && !forceRender) {
-            var node = self.node(elName + '_' + m);
-            if (!nodeParent) nodeParent = node.parentNode;
-            console.log('Partial render: ' + elName + ':' + m, node);
-            // partial render here
-            var src = null; // unchanged
             // logic - data less or more?
-            var n = m - 1, before = self.pData[elName].element[n], after = self.data[elName].element[n];
+            var n = m - 1, before = self.pData[elName].element[n], after = self.data[elName].element[n], src = null;
             if (_s(before) == _s(after)) {
-              console.log('>>> nothing is changed, skip rendering');
+              // nothing is changed, do not render
               return;
             }
-            // render
+            var node = self.node(elName + '_' + m);
+            if (!nodeParent) nodeParent = node.parentNode;
+            // partial render here
             src = self.htpl(ti, datai);
             var vn;
             if (nodeParent) {
@@ -718,13 +715,12 @@
       }
       // logic: if node exists, replace html, otherwise, return it
       // verify if we have sibling enabled - so we can append it
-      console.log('output is ' + output + ' sibling: ', this.template.sub[elName]);
       if (this.template.sub[elName]._sibling) {
         // append sibling
         var sibling = this.node(this.template.sub[elName]._sibling);
         if (sibling) {
-          nn = new vNode(output, sibling.parentNode);
-          nn.right();
+          var newNode = new vNode(output, sibling.parentNode);
+          newNode.right();
           return false;
         }
       }
