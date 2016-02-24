@@ -614,7 +614,23 @@
         if (!data.wrapper) data.wrapper = {};
         // render as wrapper
         var wAttr = this.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = 0;
+        // check prevData to ensure rendering take advantage of vNode or innerHTML
+        var tmpData = this.pData[elName];
+        var delPData = [], tmpPData = [];
+        if (!tmpData) {
+          // render all
+          forceRender = true;
+        } else {
+          delPData = _c(tmpData.element);
+        }
+        // loop and remove
+        var nodeParent = null;
         elData.map(function (item) {
+          // is this one in?
+          if (!delPData[m]) {
+            tmpPData.push(m);
+          }
+          // start rendering
           m++;
           var di = _c(item);
           var si = self.els(elName, state, di);
@@ -641,22 +657,35 @@
               // render
               src = self.htpl(ti, datai);
             }
+            var vn;
             if (node) {
+              nodeParent = node.parentNode;
               if (src) {
-                var vn = new vNode(src);
+                vn = new vNode(src);
                 vn.replace(node);
               }
+            } else {
+              // add some more to it
+              if (nodeParent) {
+                vn = new vNode(src, nodeParent);
+                vn.right();
+              } else {
+                console.log('[ERROR] unable to find node parent, can not append');
+              }
             }
-            // @TODO: add or remove by wrapper as the parent
 
           } else {
             // render as a whole (select, or force render, or initial render)
-            var src = self.htpl(ti, datai);
-            output += src;
+            output += self.htpl(ti, datai);
           }
         });
-        // @TODO: now loop from old and remove anything non-existent
-
+        // removal when 1. nodeParent, 2. elPData exists
+        if (nodeParent && !oie(tmpPData)) {
+          tmpPData.map(function (item) {
+            var node = self.node(elName + '_' + item);
+            if (node) nodeParent.removeChild(node);
+          });
+        }
 
         if (typeof output == 'string' && output.length > 1) {
           output = self.htpl(t._wrapper[0], wAttr) + output + t._wrapper[1];
