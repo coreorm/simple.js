@@ -616,20 +616,16 @@
         var wAttr = this.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = 0;
         // check prevData to ensure rendering take advantage of vNode or innerHTML
         var tmpData = this.pData[elName];
-        var delPData = [], tmpPData = [];
+        var prevElementData = [];
         if (!tmpData) {
           // render all
           forceRender = true;
         } else {
-          delPData = _c(tmpData.element);
+          prevElementData = _c(tmpData.element);
         }
         // loop and remove
-        var nodeParent = null;
+        var nodeParent = false;
         elData.map(function (item) {
-          // is this one in?
-          if (!delPData[m]) {
-            tmpPData.push(m);
-          }
           // start rendering
           m++;
           var di = _c(item);
@@ -643,34 +639,38 @@
             output += self.htpl(ti, datai);
             return;
           }
-          // normal mode
 
-          // retrive node
-          var node = self.node(elName + '_' + m);
+          // retreive node
           // 1st. if not partial, or force render, keep adding to it
           if (self.cnf.partialRender && !forceRender) {
+            var node = self.node(elName + '_' + m);
+            if (!nodeParent) nodeParent = node.parentNode;
+            console.log('Partial render: ' + elName + ':' + m, node);
             // partial render here
             var src = null; // unchanged
             // logic - data less or more?
             var n = m - 1, before = self.pData[elName].element[n], after = self.data[elName].element[n];
-            if (_s(before) != _s(after)) {
-              // render
-              src = self.htpl(ti, datai);
+            if (_s(before) == _s(after)) {
+              console.log('>>> nothing is changed, skip rendering');
+              return;
             }
+            // render
+            src = self.htpl(ti, datai);
             var vn;
-            if (node) {
-              nodeParent = node.parentNode;
-              if (src) {
-                vn = new vNode(src);
-                vn.replace(node);
-              }
-            } else {
-              // add some more to it
-              if (nodeParent) {
-                vn = new vNode(src, nodeParent);
-                vn.right();
+            if (nodeParent) {
+              if (node) {
+                if (src) {
+                  vn = new vNode(src, nodeParent);
+                  vn.replace(node);
+                }
               } else {
-                console.log('[ERROR] unable to find node parent, can not append');
+                // add some more to it
+                if (nodeParent) {
+                  vn = new vNode(src, nodeParent);
+                  vn.right();
+                } else {
+                  console.log('[ERROR] unable to find node parent, can not append');
+                }
               }
             }
 
@@ -680,15 +680,24 @@
           }
         });
         // removal when 1. nodeParent, 2. elPData exists
-        if (nodeParent && !oie(tmpPData)) {
-          tmpPData.map(function (item) {
-            var node = self.node(elName + '_' + item);
-            if (node) nodeParent.removeChild(node);
-          });
+        if (nodeParent && prevElementData.length > elData.length) {
+          prevElementData.map(function (el, item) {
+              if (item >= m) {
+                var node = self.node(elName + '_' + item);
+                // remove childnode
+                console.log('Remove child: ' + item);
+                if (node) nodeParent.removeChild(node);
+              }
+            }
+          );
         }
 
         if (typeof output == 'string' && output.length > 1) {
           output = self.htpl(t._wrapper[0], wAttr) + output + t._wrapper[1];
+        } else {
+          // stop here as it's replaced
+          console.log('=> Render Element [' + elName + ']: using DOM.');
+          return false;
         }
       } else {
         // single tag element - it should never be empty really - but lets work on it
@@ -702,7 +711,7 @@
       // logic: if node exists, replace html, otherwise, return it
       // 1st. force or no partial? return as a whole
       // 2nd - it must be partial and if node doesn't exists, return itself, otherwise, update by replacing node
-      if (!forceRender && this.cnf.partialRender === true) {
+      if (!forceRender && this.cnf.partialRender === true && output) {
         var node = this.node(elName);
         // replace
         var nn = new vNode(output);
