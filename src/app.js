@@ -18,7 +18,7 @@
    * @returns {boolean}
    */
   var oie = function (obj) {
-    return Object.keys(obj).length == 0;
+    return Object.keys(obj).length === 0;
   };
 
   /**
@@ -475,7 +475,7 @@
 
       for (var i in data) {
         d[i] = data[i];
-        if (this.attrList.indexOf(i) >= 0 || i.indexOf('data-') == 0 || i.indexOf('on') == 0) {
+        if (this.attrList.indexOf(i) >= 0 || i.indexOf('data-') === 0 || i.indexOf('on') === 0) {
           a.push(i + '="' + data[i] + '"');
         }
       }

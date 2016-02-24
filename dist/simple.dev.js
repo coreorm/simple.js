@@ -6,6 +6,106 @@
   'use strict';
 
   /**
+   * current mini seconds
+   * @returns {number}
+   */
+  var ms = function () {
+    return Date.now();
+  };
+  /**
+   * is object empty?
+   * @param obj
+   * @returns {boolean}
+   */
+  var oie = function (obj) {
+    return Object.keys(obj).length === 0;
+  };
+
+  /**
+   * virtual node
+   * @param src
+   * @param parentNode
+   */
+  var vNode = function (src, parentNode) {
+    this.src = src;
+    parentNode = parentNode || document.createElement('div');
+    this.parent = parentNode;
+    try {
+      var n = this.parent.cloneNode(false);
+      n.innerHTML = this.src;
+      this.node = n.firstChild;
+    } catch (e) {
+      console.log('ERROR:', e);
+      return;
+    }
+    // apis
+    this.left = function (node, parent) {
+      var targ = node;
+      if (node instanceof vNode) targ = node.node;
+      if (parent) this.parent = parent;
+      try {
+        this.parent.insertBefore(this.node, targ);
+      } catch (e) {
+        console.log('ERROR: vNode.left()', e);
+      }
+    };
+    this.right = function (parent) {
+      try {
+        if (parent) this.parent = parent;
+        this.parent.appendChild(this.node);
+      } catch (e) {
+        console.log('ERROR: vNode.right()', e);
+      }
+    };
+    this.replace = function (node) {
+      var targ = node;
+      if (node instanceof vNode) targ = node.node;
+      try {
+        this.parent = node.parentNode;
+        this.parent.replaceChild(this.node, targ);
+      } catch (e) {
+        console.log('ERROR: vNode.replace()', e, node);
+      }
+    };
+    this.updateHTML = function (html) {
+      try {
+        var n = this.parent.cloneNode(false);
+        var oldNode = this.node;
+        n.innerHTML = html;
+        this.node = n.firstChild;
+        this.parent.replaceChild(this.node, oldNode);
+      } catch (e) {
+        console.log('ERROR: vNode.updateHTML()', htm, e);
+      }
+    };
+    this.appendVNode = function (vNode) {
+      this.node.appendChild(vNode.node);
+    };
+    this.appendVNodes = function (vNodes) {
+      var self = this;
+      try {
+        vNodes.map(function (el) {
+          self.node.appendChild(el.node);
+        });
+      } catch (e) {
+        console.log('ERROR: vNode.appendVNodes()', e);
+      }
+    };
+    this.remove = function () {
+      this.node.remove();
+    };
+  };
+
+  /**
+   * document.getElementById
+   * @param id
+   * @returns {*}
+   */
+  function d2e(id) {
+    return document.getElementById(id);
+  }
+
+  /**
    * Events available
    */
   w.SimpleAppStart = 'sta';
@@ -50,6 +150,7 @@
    */
   var app;
   app = function (name, cnf) {
+    this.aName = name;
     // defaults
     name = _s(name).hashCode();
     var prefix = '_sj_' + name;
@@ -89,6 +190,13 @@
       ped: {},
       siu: {}
     };
+
+    /**
+     * vnodes cache, format:
+     * id => vNode
+     * @type {{}}
+     */
+    this.vNodes = {};
 
     /**
      * get call by name and type
@@ -210,9 +318,11 @@
      * template engine
      * @param template
      * @param data
+     * @param doNotSkip if true, do not skip the undefined tags
      * @returns {*}
      */
-    this.htmlTemplate = function (template, data) {
+    this.htpl = function (template, data, doNotSkip) {
+      doNotSkip = (doNotSkip === true);
       try {
         var output = template;
         for (var n in data) {
@@ -221,6 +331,8 @@
             output = output.replace(search, rep);
           }
         }
+        // clean final output
+        if (doNotSkip !== true) output = output.replace(/{[^<>}]+}/ig, '').replace(/{>([^}]+)}/ig, '{$1}');
         return output;
       } catch (e) {
         console.log('[Error] html template failure', e);
@@ -293,9 +405,17 @@
       }
       return 'default';
     };
+    /**
+     * generate element id
+     * @param elName
+     * @returns {string}
+     */
     this.eId = function (elName) {
       return prefix + '_el_' + elName;
     };
+    // list of attributes that can be used in tag
+    this.attrList = ['accesskey', 'name', 'class', 'dir', 'id', 'lang', 'style', 'tabindex', 'title', 'src', 'type',
+      'placeholder', 'selected', 'checked', 'readonly', 'disabled', 'target', 'media', 'href', 'value'];
     /**
      * callback: custom data parser
      * @param elName
@@ -311,8 +431,6 @@
       var c = this.gc('ped', elName);
       if (typeof c == 'function') return c(state, data);
       // prepare with attributes, allowed list (+ wildcar 'data-*', 'on*'):
-      var aa = ['accesskey', 'name', 'class', 'dir', 'id', 'lang', 'style', 'tabindex', 'title', 'src', 'type',
-        'placeholder', 'selected', 'checked', 'readonly', 'disabled', 'target', 'media', 'href', 'value'];
       var d = {}, a = [];
       data.name = elName;
 
@@ -357,7 +475,7 @@
 
       for (var i in data) {
         d[i] = data[i];
-        if (aa.indexOf(i) >= 0 || i.indexOf('data-') == 0 || i.indexOf('on') == 0) {
+        if (this.attrList.indexOf(i) >= 0 || i.indexOf('data-') === 0 || i.indexOf('on') === 0) {
           a.push(i + '="' + data[i] + '"');
         }
       }
@@ -372,7 +490,7 @@
      * @returns {Element}
      */
     this.node = function (elName) {
-      return document.getElementById(this.eId(elName));
+      return d2e(this.eId(elName));
     };
     /*------ render ------*/
     /**
@@ -398,63 +516,69 @@
     };
     /**
      * render entire app
-     * @param forceRender if true, force a complete render
+     * @param full if true, force a complete render
+     *
+     * RUN LOGIC:
+     * 1. data changed for el?
+     *  1.1 is it a wrapper type?
+     *    YES: go to 1.2
+     *    NO:
+     *      1.1.0 is the vNode non-existent?
+     *        YES: new vNode()
+     *        NO: is the template style changed?
+     *          YES: new vNode
+     *          NO: go to next
+     *      1.1.1 is the data empty?
+     *        YES: vNode.remove()
+     *        NO: vNode.updateHTML()
+     *  1.2 yes it's a wrapper
+     *    1.2.0 is vNode non-existent?
+     *      YES: new vNode plus children
+     *      NO: go to next
+     *    1.2.1 loop thru children:
+     *      with each child:
+     *      new data count > old data count?
+     *      YES:
+     *        vNode exists?
+     *          YES: vNode.updateHTML() - no need to remove anything (so order doesn't really matter)
+     *          NO: new vNode, vNode.right(parent);
+     *     NO:
+     *        count vNode and remove ones that are not in vNode.remove()
      */
-    this.render = function (forceRender) {
+    this.render = function (full) {
+      console.log('=> Start Rendering ' + this.aName);
       this._f('wrd');
-      forceRender = (forceRender === true);
-      console.log('=> Rendering Main Template For app: ' + this.name + ' should force render: ' + forceRender);
       if (!this.container) throw new Error('Invalid container specified');
-      var s = this.style;
-      var t = this.template.main[s];
-      var d = this.cache;
+      // findout main template details
+      var t = this.template.main[this.style];
+      var d = {};
       if (!t) throw new Error('Invalid master template for style: ' + s);
-
-      var elUpdated = forceRender;
-
-      for (var n in this.template.sub) {
-        // partial if enabled
-        if (this.cnf.partialRender && _s(this.state[n]) == _s(this.pState[n]) && typeof d[n] == 'string' && _s(this.data[n]) == _s(this.pData[n]) && !forceRender) {
-          console.log('Partial rendering - render from cache for ' + n); // no need to set anything
-        } else {
-          var src = this.renderElement(n, forceRender);
-          // if it's false, it's empty
-          if (src === false) {
-            d[n] = '';
-          } else {
-            // here's the fun part - if obj is in there, do it!
-            var node = this.node(n);
-            if (node) {
-              if (typeof src == 'string' && src.length > 0) {
-                this.h2n(src, node);
-              } else {
-                console.log('Node has children, and will be replaced one by one');
-              }
-            } else {
-              if (typeof src == 'string' && src.length > 0) {
-                // this means it's fully rendered
-                console.log('New Render Generated for ' + n);
-                d[n] = src;
-                elUpdated = true;
-              }
-            }
-          }
-        }
+      // logic: force render clears prevData, and that, is that.
+      if (full === true) this.pData = {};
+      // verify data presence
+      if (oie(this.data) || _s(this.pData) == _s(this.data)) {
+        // nothing to render - data is empty, or data is unchanged
+        console.log('No data found, nothing will be rendered');
+        return;
       }
+      // principle: render never will use cache - just use id and nodes, so main data should be null
+      // set control: force render
+      var forceRender = oie(this.pData);
+      // start loop and render (and pass forceRender if necessary)
+      for (var n in this.template.sub) {
+        console.log('=> Render sub: ' + n);
+        var tmp = this.renderElement(n, forceRender);
+        if (tmp) d[n] = tmp;
+      }
+      if (forceRender || !oie(d)) {
+        this.container.innerHTML = this.htpl(t, d);
+      }
+      // at the end, run callback and set state/data
       // make previous state the same as current now
       this.pState = _c(this.state);
       // also make previous data the same as current data in elements
       this.pData = _c(this.data);
-      // verify changes
-      if (!elUpdated) {
-        // nothing is really changed, DO NOT render again
-        console.log('Data is unchanged, and no elements are changed, stop rendering');
-        return;
-      }
-      console.log('Data is changed, rendering the whole thing');
-      // this would replace all {xxx} stuff - so use skip {>name} if you want to display {name}
-      this.container.innerHTML = this.htmlTemplate(t, d).replace(/{[^<>}]+}/ig, '').replace(/{>([^}]+)}/ig, '{$1}');
-      // finally, run did render
+      // callback
       this._f('drd');
       console.log('=> Finish Rendering');
     };
@@ -466,64 +590,135 @@
      */
     this.renderElement = function (elName, forceRender) {
       forceRender = (forceRender === true);
-      if (typeof this.template.sub[elName] != 'object') {
-        console.log('[Warning] No element template found for ' + elName + ' - return empty string');
-        return false;
-      }
       // figure out the type (from template._type)
       var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
-      if (Object.keys(data).length == 0 && this.cnf.skipEmptyData === true) {
-        console.log('Empty Data, skipping rendering, also this.cnf', this.cnf);
-        return false;
+
+      if (typeof this.template.sub[elName] != 'object' || (oie(data) && this.cnf.skipEmptyData === true)) {
+        console.log('[Warning] No element template found or empty data for ' + elName + ' - return empty string');
+        return '';
       }
-      console.log('=> Rendering ' + elName + ' with state: ', _s(state));
       // if custom render function exists, use it.
       var c = this.gc('rde', elName);
       if (typeof c == 'function') return c(state, data);
+      // is data changed? if not, do not render (when partial)
+      if (_s(this.data[elName]) == _s(this.pData[elName])) {
+        console.log('nothing changed, skip rendering');
+        return false;
+      }
+
       // does it have a wrapper? if not, render as a single element
       var t = this.template.sub[elName], type = t._type;
       var self = this;
       if (t._wrapper) {
+        // logic: same or less -> vNode.updateHTML || vNode.remove(), more? vNode.right();
         if (!data.wrapper) data.wrapper = {};
         // render as wrapper
         var wAttr = this.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = 0;
+        // check prevData to ensure rendering take advantage of vNode or innerHTML
+        var tmpData = this.pData[elName];
+        var prevElementData = [];
+        if (!tmpData) {
+          // render all
+          forceRender = true;
+        } else {
+          prevElementData = _c(tmpData.element);
+        }
+        // loop and remove
+        var nodeParent = false;
         elData.map(function (item) {
+          // start rendering
           m++;
           var di = _c(item);
           var si = self.els(elName, state, di);
           var ti = self.template.sub[elName][si];
           var datai = self.parseElementData(elName, state, di, t._type, m);
           if (!ti) ti = self.template.sub[elName]['default'];
-          // wait - do we have this sub node yet?
-          var snode = self.node(elName + '_' + m);
-          var nodeSrc = self.htmlTemplate(ti, datai);
-          // partial rendering
-          if (snode && self.cnf.partialRender && !forceRender) {
-            // verify if node needs to be re-rendered
-            var n = m - 1, before = _s(self.pData[elName].element[n]), after = _s(self.data[elName].element[n]);
-            if (before != after) {
-              console.log('=> Render: node for element:' + elName + '_' + m + ' should be replaced', snode, nodeSrc);
-              self.h2n(nodeSrc, snode);
-            } else {
-              // same!
-              console.log('node for element ' + elName + ':' + m + ' is unchanged, do not render');
+          // is it select type?
+          if (t._type == 'select') {
+            // just render and go
+            output += self.htpl(ti, datai);
+            return;
+          }
+
+          // retreive node
+          // 1st. if not partial, or force render, keep adding to it
+          if (self.cnf.partialRender && !forceRender) {
+            var node = self.node(elName + '_' + m);
+            if (!nodeParent) nodeParent = node.parentNode;
+            console.log('Partial render: ' + elName + ':' + m, node);
+            // partial render here
+            var src = null; // unchanged
+            // logic - data less or more?
+            var n = m - 1, before = self.pData[elName].element[n], after = self.data[elName].element[n];
+            if (_s(before) == _s(after)) {
+              console.log('>>> nothing is changed, skip rendering');
+              return;
             }
+            // render
+            src = self.htpl(ti, datai);
+            var vn;
+            if (nodeParent) {
+              if (node) {
+                if (src) {
+                  vn = new vNode(src, nodeParent);
+                  vn.replace(node);
+                }
+              } else {
+                // add some more to it
+                if (nodeParent) {
+                  vn = new vNode(src, nodeParent);
+                  vn.right();
+                } else {
+                  console.log('[ERROR] unable to find node parent, can not append');
+                }
+              }
+            }
+
           } else {
-            console.log('re-render the reset');
-            output += nodeSrc;
+            // render as a whole (select, or force render, or initial render)
+            output += self.htpl(ti, datai);
           }
         });
+        // removal when 1. nodeParent, 2. elPData exists
+        if (nodeParent && prevElementData.length > elData.length) {
+          prevElementData.map(function (el, item) {
+              if (item >= m) {
+                var node = self.node(elName + '_' + item);
+                // remove childnode
+                console.log('Remove child: ' + item);
+                if (node) nodeParent.removeChild(node);
+              }
+            }
+          );
+        }
+
         if (typeof output == 'string' && output.length > 1) {
-          console.log('>>> ' + elName + ' output length is ' + output.length);
-          output = self.htmlTemplate(t._wrapper[0], wAttr) + output + t._wrapper[1];
+          output = self.htpl(t._wrapper[0], wAttr) + output + t._wrapper[1];
+        } else {
+          // stop here as it's replaced
+          console.log('=> Render Element [' + elName + ']: using DOM.');
+          return false;
         }
       } else {
+        // single tag element - it should never be empty really - but lets work on it
+        console.log('>>> render [' + elName + '] as a whole');
         var si = this.els(elName, state, data);
         var ti = this.template.sub[elName][si];
         var datai = this.parseElementData(elName, state, data, t._type);
         if (!ti) ti = this.template.sub[elName]['default'];
-        output += this.htmlTemplate(ti, datai);
+        output = this.htpl(ti, datai);
       }
+      // logic: if node exists, replace html, otherwise, return it
+      // 1st. force or no partial? return as a whole
+      // 2nd - it must be partial and if node doesn't exists, return itself, otherwise, update by replacing node
+      if (!forceRender && this.cnf.partialRender === true && output) {
+        var node = this.node(elName);
+        // replace
+        var nn = new vNode(output);
+        nn.replace(node);
+        return false;
+      }
+      // finally, default
       return output;
     };
     /*------ init ------*/
