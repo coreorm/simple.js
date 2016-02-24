@@ -413,9 +413,6 @@
     this.eId = function (elName) {
       return prefix + '_el_' + elName;
     };
-    // list of attributes that can be used in tag
-    this.attrList = ['accesskey', 'name', 'class', 'dir', 'id', 'lang', 'style', 'tabindex', 'title', 'src', 'type',
-      'placeholder', 'selected', 'checked', 'readonly', 'disabled', 'target', 'media', 'href', 'value'];
     /**
      * callback: custom data parser
      * @param elName
@@ -475,7 +472,8 @@
 
       for (var i in data) {
         d[i] = data[i];
-        if (this.attrList.indexOf(i) >= 0 || i.indexOf('data-') === 0 || i.indexOf('on') === 0) {
+        // rule: all custom variables must start with _, others will be treated as attributes
+        if (i.indexOf('_') < 0) {
           a.push(i + '="' + data[i] + '"');
         }
       }
@@ -594,7 +592,17 @@
       var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
 
       if (typeof this.template.sub[elName] != 'object' || (oie(data) && this.cnf.skipEmptyData === true)) {
-        console.log('[Warning] No element template found or empty data for ' + elName + ' - return empty string');
+        console.log('[Warning] No element template found or empty data for ' + elName);
+        // decide whether to remove it from parent...
+        if (this.cnf.partialRender && !forceRender) {
+          var existingNode = this.node(elName);
+          if (existingNode) {
+            console.log('No data found, remove node');
+            existingNode.parentNode.removeChild(existingNode);
+            return false;
+          }
+        }
+
         return '';
       }
       // if custom render function exists, use it.
@@ -709,14 +717,26 @@
         output = this.htpl(ti, datai);
       }
       // logic: if node exists, replace html, otherwise, return it
-      // 1st. force or no partial? return as a whole
+      // verify if we have sibling enabled - so we can append it
+      console.log('output is ' + output + ' sibling: ', this.template.sub[elName]);
+      if (this.template.sub[elName]._sibling) {
+        // append sibling
+        var sibling = this.node(this.template.sub[elName]._sibling);
+        if (sibling) {
+          nn = new vNode(output, sibling.parentNode);
+          nn.right();
+          return false;
+        }
+      }
       // 2nd - it must be partial and if node doesn't exists, return itself, otherwise, update by replacing node
       if (!forceRender && this.cnf.partialRender === true && output) {
-        var node = this.node(elName);
+        var node = this.node(elName), nn = null;
         // replace
-        var nn = new vNode(output);
-        nn.replace(node);
-        return false;
+        if (node) {
+          nn = new vNode(output);
+          nn.replace(node);
+          return false;
+        }
       }
       // finally, default
       return output;
