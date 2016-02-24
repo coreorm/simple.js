@@ -120,7 +120,7 @@
     // load page by hash
     window.currentPage = '';
     window.loadPage = function (hash) {
-      if (!hash) hash = (location.href.split("#")[1] || null);
+      if (!hash) hash = (window.location.hash || null);
       var page;
       if (!hash) {
         page = 'home';
@@ -135,8 +135,6 @@
       console.log('load page: ' + page);
       loadJs(page, '_page');
     };
-    // run initially
-    loadPage();
     // modal
     function modal(t, b) {
       if (t) $('.modal-title').html(t);
@@ -178,5 +176,6 @@
 <script async src="js/bootstrap.min.js"></script>
 <script async src="js/micromarkdown.min.js"></script>
 <script async src="apps/nav.js"></script>
+<script>loadPage();</script>
 </body>
 </html>
