@@ -9,7 +9,7 @@
     "pretest": "npm run lint -s",
     "build": "echo '=> Build All' && npm run build:dev && uglifyjs -c drop_console=true dist/simple.dev.js -o dist/simple.js && minify dist/simple.js && rm dist/simple.js",
     "build:dev": "echo '=> Build Dev' && cat src/start.inc src/app.js src/end.inc > dist/simple.dev.js",
-    "watch": "watch 'npm run build:dev' src/",
+    "watch": "watch 'npm run build' src/",
     "server": "http-server ./"
   },
   "keywords": [

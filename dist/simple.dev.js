@@ -2,8 +2,7 @@
 /*jslint browser: true*/
 /*jslint node: true */
 'use strict';
-var w = window, con = window.console;
-
+var w = window;
 /**
  * current mini seconds
  * @returns {number}
@@ -34,7 +33,7 @@ var vNode = function (src, parentNode) {
     n.innerHTML = this.src;
     this.node = n.firstChild;
   } catch (e) {
-    con.log('ERROR:', e);
+    console.log('ERROR:', e);
     return;
   }
   // apis
@@ -45,7 +44,7 @@ var vNode = function (src, parentNode) {
     try {
       this.parent.insertBefore(this.node, targ);
     } catch (e) {
-      con.log('ERROR: vNode.left()', e);
+      console.log('ERROR: vNode.left()', e);
     }
   };
   this.right = function (parent) {
@@ -53,7 +52,7 @@ var vNode = function (src, parentNode) {
       if (parent) this.parent = parent;
       this.parent.appendChild(this.node);
     } catch (e) {
-      con.log('ERROR: vNode.right()', e);
+      console.log('ERROR: vNode.right()', e);
     }
   };
   this.replace = function (node) {
@@ -63,7 +62,7 @@ var vNode = function (src, parentNode) {
       this.parent = node.parentNode;
       this.parent.replaceChild(this.node, targ);
     } catch (e) {
-      con.log('ERROR: vNode.replace()', e, node);
+      console.log('ERROR: vNode.replace()', e, node);
     }
   };
   this.updateHTML = function (html) {
@@ -74,7 +73,7 @@ var vNode = function (src, parentNode) {
       this.node = n.firstChild;
       this.parent.replaceChild(this.node, oldNode);
     } catch (e) {
-      con.log('ERROR: vNode.updateHTML()', html, e);
+      console.log('ERROR: vNode.updateHTML()', html, e);
     }
   };
   this.appendVNode = function (vNode) {
@@ -87,7 +86,7 @@ var vNode = function (src, parentNode) {
         self.node.appendChild(el.node);
       });
     } catch (e) {
-      con.log('ERROR: vNode.appendVNodes()', e);
+      console.log('ERROR: vNode.appendVNodes()', e);
     }
   };
   this.remove = function () {
@@ -230,7 +229,7 @@ app = function (name, cnf) {
       for (var k in calls) {
         var call = calls[k];
         if (typeof call == 'function') {
-          con.log('>> calls - ' + k, calls);
+          console.log('>> calls - ' + k, calls);
           call();
         }
       }
@@ -244,12 +243,12 @@ app = function (name, cnf) {
   this.updateState = function (elementOrName, valueOrNull) {
     var name, value, el;
     if (typeof elementOrName == 'string') {
-      con.log('=> update state by name/value', elementOrName, valueOrNull);
+      console.log('=> update state by name/value', elementOrName, valueOrNull);
       name = elementOrName;
       value = valueOrNull;
       this.state[elementOrName] = valueOrNull;
     } else if (typeof elementOrName == 'object' && typeof elementOrName.nodeName == 'string') {
-      con.log('=> update state by element', elementOrName);
+      console.log('=> update state by element', elementOrName);
       // must be object
       el = elementOrName;
       var nodeName = el.nodeName;
@@ -327,7 +326,7 @@ app = function (name, cnf) {
       if (doNotSkip !== true) output = output.replace(/{[^<>}]+}/ig, '').replace(/{>([^}]+)}/ig, '{$1}');
       return output;
     } catch (e) {
-      con.log('[Error] html template failure', e);
+      console.log('[Error] html template failure', e);
       return '';
     }
   };
@@ -349,7 +348,7 @@ app = function (name, cnf) {
       try {
         this.state = JSON.parse(d);
       } catch (e) {
-        con.log('[ERROR] Unable to parse state ' + d, e);
+        console.log('[ERROR] Unable to parse state ' + d, e);
       }
     }
   };
@@ -381,7 +380,7 @@ app = function (name, cnf) {
   this.els = function (elName, state, data) {
     // is there style in template setting already?
     if (data._style) {
-      con.log('>>> Style for ' + elName + ': ' + data._style);
+      console.log('>>> Style for ' + elName + ': ' + data._style);
       return data._style;
     }
     // otherwise, default
@@ -446,7 +445,7 @@ app = function (name, cnf) {
     d.selectState = '';
     // select
     if (subNodeCnt > 0 && _s(state).indexOf(_s(data.value)) >= 0) {
-      con.log('check select: ' + state + ' <> ' + data.value);
+      console.log('check select: ' + state + ' <> ' + data.value);
       if (type == 'select') {
         data.selected = 'selected';
         d.selectState = 'selected="selected"';
@@ -466,7 +465,7 @@ app = function (name, cnf) {
     }
     d.attr = a.join(' ');
     d.action = act;
-    if (elName == 'welcomeStyle') con.log('>>> parseElementData', d);
+    if (elName == 'welcomeStyle') console.log('>>> parseElementData', d);
     return d;
   };
   /**
@@ -516,7 +515,7 @@ app = function (name, cnf) {
    */
   this.render = function (full) {
     var stime = ms();
-    con.log('=> Start Rendering ' + this.aName);
+    console.log('=> Start Rendering ' + this.aName);
     this._f('wrd');
     if (!this.container) throw new Error('Invalid container specified');
     // findout main template details
@@ -528,14 +527,14 @@ app = function (name, cnf) {
     // verify data presence
     if (oie(this.data) || _s(this.pData) == _s(this.data)) {
       // nothing to render - data is empty, or data is unchanged
-      con.log('No data found, nothing will be rendered');
+      console.log('No data found, nothing will be rendered');
       return;
     }
     // set control: force render
     var forceRender = oie(this.pData);
     // start loop and render (and pass forceRender if necessary)
     for (var n in this.template.sub) {
-      con.log('=> Render sub: ' + n);
+      console.log('=> Render sub: ' + n);
       var tmp = this.renderElement(n, forceRender);
       if (tmp) d[n] = tmp;
     }
@@ -549,7 +548,7 @@ app = function (name, cnf) {
     this.pData = _c(this.data);
     // callback
     this._f('drd');
-    con.log('=> Finish Rendering in ' + (ms() - stime) + ' ms');
+    console.log('=> Finish Rendering in ' + (ms() - stime) + ' ms');
   };
   /**
    * render single element
@@ -563,12 +562,12 @@ app = function (name, cnf) {
     var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
 
     if (typeof this.template.sub[elName] != 'object' || (oie(data) && this.cnf.skipEmptyData === true)) {
-      con.log('[Warning] No element template found or empty data for ' + elName);
+      console.log('[Warning] No element template found or empty data for ' + elName);
       // decide whether to remove it from parent...
       if (this.cnf.partialRender && !forceRender) {
         var existingNode = this.node(elName);
         if (existingNode) {
-          con.log('No data found, remove node');
+          console.log('No data found, remove node');
           existingNode.parentNode.removeChild(existingNode);
           return false;
         }
@@ -644,7 +643,7 @@ app = function (name, cnf) {
                 vn = new vNode(src, nodeParent);
                 vn.right();
               } else {
-                con.log('[ERROR] unable to find node parent, can not append');
+                console.log('[ERROR] unable to find node parent, can not append');
               }
             }
           }
@@ -660,7 +659,7 @@ app = function (name, cnf) {
             if (item >= m) {
               var node = self.node(elName + '_' + item);
               // remove childnode
-              con.log('Remove child: ' + item);
+              console.log('Remove child: ' + item);
               if (node) nodeParent.removeChild(node);
             }
           }
@@ -671,12 +670,12 @@ app = function (name, cnf) {
         output = self.htpl(t._wrapper[0], wAttr) + output + t._wrapper[1];
       } else {
         // stop here as it's replaced
-        con.log('=> Render Element [' + elName + ']: using DOM.');
+        console.log('=> Render Element [' + elName + ']: using DOM.');
         return false;
       }
     } else {
       // single tag element - it should never be empty really - but lets work on it
-      con.log('>>> render [' + elName + '] as a whole');
+      console.log('>>> render [' + elName + '] as a whole');
       var si = this.els(elName, state, data);
       var ti = this.template.sub[elName][si];
       var datai = this.parseElementData(elName, state, data, t._type);
