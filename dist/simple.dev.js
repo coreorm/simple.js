@@ -141,7 +141,7 @@
    * @private
    */
   var _c = function (obj) {
-    return JSON.parse(JSON.stringify(obj));
+    return JSON.parse(_s(obj));
   };
   /**
    * app base class
@@ -190,13 +190,6 @@
       ped: {},
       siu: {}
     };
-
-    /**
-     * vnodes cache, format:
-     * id => vNode
-     * @type {{}}
-     */
-    this.vNodes = {};
 
     /**
      * get call by name and type
@@ -357,7 +350,7 @@
         try {
           this.state = JSON.parse(d);
         } catch (e) {
-          console.log('Unable to parse state ' + d, e);
+          console.log('[ERROR] Unable to parse state ' + d, e);
         }
       }
     };
@@ -380,11 +373,6 @@
      * @type {{main: {}, sub: {}}}
      */
     this.pData = {};
-    /**
-     * elements cache
-     * @type {{}}
-     */
-    this.cache = {};
     /**
      * callback: get element style
      * @param elName
@@ -497,22 +485,6 @@
      */
     this.style = 'default';
     /**
-     * html to node replace
-     * @param src
-     * @param node must have node
-     * @returns {*}
-     */
-    this.h2n = function (src, node) {
-      // need parent, or kill
-      var p = node.parentElement;
-      if (p) {
-        var pn = p.cloneNode();
-        pn.innerHTML = src;
-        // replace now
-        p.replaceChild(pn.firstChild, node);
-      }
-    };
-    /**
      * render entire app
      * @param full if true, force a complete render
      *
@@ -560,7 +532,6 @@
         console.log('No data found, nothing will be rendered');
         return;
       }
-      // principle: render never will use cache - just use id and nodes, so main data should be null
       // set control: force render
       var forceRender = oie(this.pData);
       // start loop and render (and pass forceRender if necessary)

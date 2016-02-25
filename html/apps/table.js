@@ -2,6 +2,8 @@
  * table test with many, many fields
  */
 (function () {
+  // code some data out!!
+  var cols = 10, rows = 20;
   var app = SimpleApp('table', {
     localStorageRead: false
   });
@@ -35,8 +37,6 @@
       }
     }
   };
-  // code some data out!!
-  var cols = 10, rows = 10;
   app.data = {
     hdr: {element: []},
     // form

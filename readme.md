@@ -1,6 +1,6 @@
 # Component-based Simple JS App Lib
 
-Simple.js is not a framework like Angular, it's a native JS library that's small (less than 6K), and fast (avoid DOM operations whenever possible).
+Simple.js is not a framework like Angular, it's a native JS library that's small (only 7K in size), and fast (render a complete 100x100 table under 1 second, and updating individual cells under 5 ms).
 
 ## What can you do with it?
 
