@@ -11,7 +11,7 @@ var ms = function () {
 };
 /**
  * is object empty?
- * @param obj
+ * @param {object} obj
  * @returns {boolean}
  */
 var oie = function (obj) {
@@ -20,8 +20,8 @@ var oie = function (obj) {
 
 /**
  * virtual node
- * @param src
- * @param parentNode
+ * @param {string} src
+ * @param {object} parentNode
  */
 var vNode = function (src, parentNode) {
   this.src = src;
@@ -95,7 +95,7 @@ var vNode = function (src, parentNode) {
 
 /**
  * document.getElementById
- * @param id
+ * @param {string} id
  * @returns {*}
  */
 function d2e(id) {
@@ -126,7 +126,7 @@ String.prototype.hashCode = function () {
 };
 /**
  * string converter
- * @param obj
+ * @param {object} obj
  * @private
  */
 var _s = function (obj) {
@@ -134,7 +134,7 @@ var _s = function (obj) {
 };
 /**
  * obj copier
- * @param obj
+ * @param {object} obj
  * @private
  */
 var _c = function (obj) {
@@ -142,8 +142,8 @@ var _c = function (obj) {
 };
 /**
  * app base class
- * @param name
- * @param cnf
+ * @param {string} name
+ * @param {object} cnf
  */
 var app;
 app = function (name, cnf) {
@@ -190,8 +190,8 @@ app = function (name, cnf) {
 
   /**
    * get call by name and type
-   * @param type
-   * @param name
+   * @param {string} type
+   * @param {string} name
    * @returns {*}
    */
   this.getCallback = function (type, name) {
@@ -206,9 +206,9 @@ app = function (name, cnf) {
 
   /**
    * event triggers
-   * @param type
-   * @param name
-   * @param callback
+   * @param {string} type
+   * @param {string} name
+   * @param {function} callback
    */
   this.on = function (type, name, callback) {
     if (typeof this.callbacks[type] == 'object') {
@@ -219,7 +219,7 @@ app = function (name, cnf) {
   };
   /**
    * fire events
-   * @param type
+   * @param {string} type
    * @private
    */
   this._f = function (type) {
@@ -236,8 +236,8 @@ app = function (name, cnf) {
   };
   /**
    * update state of an element
-   * @param elementOrName, if value presents and this param is string, this will be a direct update
-   * @param valueOrNull optional, if the first param is element with value, it will use that
+   * @param {*} elementOrName, if value presents and this param is string, this will be a direct update
+   * @param {*} valueOrNull optional, if the first param is element with value, it will use that
    */
   this.updateState = function (elementOrName, valueOrNull) {
     var name, value, el;
@@ -296,7 +296,7 @@ app = function (name, cnf) {
   /**
    * add cr to fire this for your own elements
    * or even directly over-write this function
-   * @param data
+   * @param {object} data
    */
   this.stateIsUpdated = function (data) {
     // callback by name
@@ -306,9 +306,9 @@ app = function (name, cnf) {
   };
   /**
    * template engine
-   * @param template
-   * @param data
-   * @param doNotSkip if true, do not skip the undefined tags
+   * @param {string} template
+   * @param {object} data
+   * @param {boolean} doNotSkip if true, do not skip the undefined tags
    * @returns {*}
    */
   this.htpl = function (template, data, doNotSkip) {
@@ -372,9 +372,11 @@ app = function (name, cnf) {
   this.pData = {};
   /**
    * callback: get element style
-   * @param elName
-   * @param state
-   * @param data
+   * @param {string} elName
+   * @param {object} state
+   * @param {object} data
+   *
+   * @returns {*}
    */
   this.els = function (elName, state, data) {
     // is there style in template setting already?
@@ -392,7 +394,7 @@ app = function (name, cnf) {
   };
   /**
    * generate element id
-   * @param elName
+   * @param {string} elName
    * @returns {string}
    */
   this.eId = function (elName) {
@@ -400,11 +402,11 @@ app = function (name, cnf) {
   };
   /**
    * callback: custom data parser
-   * @param elName
-   * @param state
-   * @param data
-   * @param type
-   * @param subNodeCnt if > 0, it's a sub node
+   * @param {string} elName
+   * @param {object} state
+   * @param {object} data
+   * @param {string} type
+   * @param {int} subNodeCnt if > 0, it's a sub node
    * @returns {{}}
    */
   this.parseElementData = function (elName, state, data, type, subNodeCnt) {
@@ -468,8 +470,8 @@ app = function (name, cnf) {
     return d;
   };
   /**
-   * get element by name
-   * @param elName
+   * get node by elementName
+   * @param {string} elName
    * @returns {Element}
    */
   this.node = function (elName) {
@@ -483,7 +485,7 @@ app = function (name, cnf) {
   this.style = 'default';
   /**
    * render entire app
-   * @param full if true, force a complete render
+   * @param {boolean} full if true, force a complete render
    *
    * RUN LOGIC:
    * 1. data changed for el?
@@ -551,8 +553,8 @@ app = function (name, cnf) {
   };
   /**
    * render single element
-   * @param elName
-   * @param forceRender if true, for render without using node
+   * @param {string} elName
+   * @param {boolean} forceRender if true, for render without using node
    * @returns {*}
    */
   this.renderElement = function (elName, forceRender) {
@@ -708,8 +710,8 @@ app = function (name, cnf) {
   /*------ init ------*/
   /**
    * init app
-   * @param container
-   * @param autoRender
+   * @param {string} container
+   * @param {boolean} autoRender
    */
   this.init = function (container, autoRender) {
     if (container) this.container = container;
@@ -723,7 +725,8 @@ app = function (name, cnf) {
   };
 
   /**
-   * export as querystring
+   * export to query string
+   * @returns {string}
    */
   this.toQuerystring = function () {
     var qs = [];
@@ -735,11 +738,11 @@ app = function (name, cnf) {
     }
     return qs.join('&');
   };
-  // apis for fast access over data
   /**
-   * locate the current data object
-   * @param elName
-   * @param nodePosition
+   * apis for fast access over data
+   * @param {string} elName
+   * @param {int} nodePosition
+   * @returns {*}
    */
   this.d = function (elName, nodePosition) {
     if (!nodePosition) {
@@ -754,12 +757,20 @@ app = function (name, cnf) {
 /*------ export ------*/
 var z = {};
 /**
+ * THIS IS THE MAIN ENTRY POINT
+ *
  * create / retrieve a single app
- * @param name
- * @param config | note: this is the system config
+ *
+ * e.g.
+ * ```
+ * var app = SimpleApp('my-app', {skipEmptyData:true});
+ * app.init(document.getElementById('app_container'), true);
+ * ```
+ * @param {string} name
+ * @param {object} config | note: this is the system config
  * @returns {SimpleApp}
  */
-w.SimpleApp = function (name, config) {
+var SimpleApp = function (name, config) {
   if (!z[name]) z[name] = new app(name, config);
   return z[name];
 };

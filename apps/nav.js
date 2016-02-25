@@ -21,7 +21,7 @@
           title: 'getting started'
         },
         {
-          href: '#api-guide',
+          href: 'docs/',
           label: 'API Guide',
           title: 'API Guide'
         },
@@ -64,11 +64,6 @@
       default: '<li id="{id}"><a onclick="loadPage(\'{href}\')" href="{href}">{label}</a></li>'
     }
   };
-  // listen to link change
-  app.on(SimpleAppStateIsUpdated, 'load-page', function (data) {
-    var el = data.element;
-    alert(el);
-  });
 
   // init app (and auto render only for this one)
   app.init(document.getElementById('nav'), true);
