@@ -7,8 +7,8 @@
     "info": "echo 'Simple JS for Apps, supports defer/async and uses native JS with no external libs'",
     "lint": "echo '=> JS Linkting' && jshint src/*.js",
     "pretest": "npm run lint -s",
-    "build": "echo '=> Build All' && uglifyjs -c drop_console=true src/app.js -o dist/simple.js && minify dist/simple.js && rm dist/simple.js",
-    "build:dev": "echo '=> Build Dev' && cat src/app.js > dist/simple.dev.js && npm run build -s",
+    "build": "echo '=> Build All' && npm run build:dev && uglifyjs -c drop_console=true dist/simple.dev.js -o dist/simple.js && minify dist/simple.js && rm dist/simple.js",
+    "build:dev": "echo '=> Build Dev' && cat src/start.inc src/app.js src/end.inc > dist/simple.dev.js",
     "watch": "watch 'npm run build:dev' src/",
     "server": "http-server ./"
   },
