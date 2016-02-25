@@ -14,7 +14,8 @@ Build web apps, but not just one app, it supports multiple apps co-existing with
 var app = SimpleApp('my-app', {
     localStorageWrite: true,
     localStorageRead: true,
-    partialRender: true
+    partialRender: true,
+    skipEmptyData: true
 });
 ```
 * App has one main component, and a number of elements underneath
