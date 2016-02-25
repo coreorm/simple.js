@@ -1,93 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Home - Documentation</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple App Engine</title>
+  <script>
+    // default style
+    window.defaultStyle = 'default';
+    window.btnStyle = 'primary';
+    // load JS
+    var loadedJS = {};
+    var loadedCSS = [];
+    function loadJs(src, nodeName) {
+      if (loadedJS[nodeName]) {
+        // remove existing one
+        try {
+          document.head.removeChild(loadedJS[nodeName]);
+        } catch (e) {
+          console.log('ERROR:', e);
+        }
+        loadedJS[nodeName] = null;
+      }
+      if (!loadedJS[src]) {
+        var s = document.createElement('script');
+        s.setAttribute("type", "text/javascript");
+        s.setAttribute('defer', 'defer');
+        s.setAttribute("src", src + '?d=' + Date.now());
+        document.head.appendChild(s);
+        if (!nodeName) nodeName = src;
+        loadedJS[nodeName] = s;
+        console.log('script: ' + src + ' is loaded');
+      } else {
+        // remove it and load again
+        try {
+          console.log('remove already loaded script and reload');
+          document.head.removeChild(loadedJS[src]);
+          // then load again...
+          loadedJS[src] = null;
+          loadJs(src);
+        } catch (e) {
+          console.log('ERROR', e);
+        }
+      }
+    }
+    function loadCss(src) {
+      if (!loadedCSS[src]) {
+        var s = document.createElement('link');
+        s.setAttribute("rel", "stylesheet");
+        s.setAttribute("href", src);
+        document.head.appendChild(s);
+        loadedCSS[src] = s;
+        console.log('style: ' + src + ' is loaded');
+      }
+    }
 
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    // load page by hash
+    window.currentPage = '';
+    window.loadPage = function (hash) {
+      if (!hash) hash = (window.location.hash || null);
+      var page;
+      if (!hash) {
+        page = 'home';
+      } else {
+        page = hash.replace('#', '');
+      }
+      if (page == window.currentPage) {
+        return;
+      }
+      window.page = currentPage;
+      page = 'pages/' + page + '.js';
+      console.log('load page: ' + page);
+      loadJs(page, '_page');
+    };
+    // modal
+    function modal(t, b) {
+      if (t) $('.modal-title').html(t);
+      if (b) $('.modal-body').html(b);
+      $('#myModal').modal('show');
+    }
+  </script>
+  <link href="theme/blog.css" rel="stylesheet" />
 </head>
 <body>
+<nav class="navbar navbar-inverse navbar-static-top" id="nav"></nav>
+<div class="container" id="apps"></div>
 
-<input type="checkbox" id="nav-trigger" class="nav-trigger" />
-<label for="nav-trigger" class="navicon-button x">
-  <div class="navicon"></div>
-</label>
-
-<label for="nav-trigger" class="overlay"></label>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#_c">_c</a></li><li><a href="global.html#_f">_f</a></li><li><a href="global.html#_s">_s</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#callbacks">callbacks</a></li><li><a href="global.html#d">d</a></li><li><a href="global.html#d2e">d2e</a></li><li><a href="global.html#data">data</a></li><li><a href="global.html#eId">eId</a></li><li><a href="global.html#els">els</a></li><li><a href="global.html#getCallback">getCallback</a></li><li><a href="global.html#htpl">htpl</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#ms">ms</a></li><li><a href="global.html#node">node</a></li><li><a href="global.html#oie">oie</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#parseElementData">parseElementData</a></li><li><a href="global.html#pData">pData</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#renderElement">renderElement</a></li><li><a href="global.html#stateIsUpdated">stateIsUpdated</a></li><li><a href="global.html#store">store</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#template">template</a></li><li><a href="global.html#toQuerystring">toQuerystring</a></li><li><a href="global.html#updateState">updateState</a></li><li><a href="global.html#vNode">vNode</a></li></ul>
-</nav>
-
-<div id="main">
-    
-
-    
-
-
-
-    
-
-
-
-
-
-
-
-
-
-    
-
-
-    <section class="readme">
-        <article><h1>Component-based Simple JS App Lib</h1><p>Simple.js is not a framework like Angular, it's a native JS library that's small (only 7K in size), and fast (render a complete 100x100 table under 1 second, and updating individual cells under 5 ms).</p>
-<h2>What can you do with it?</h2><p>Build web apps, but not just one app, it supports multiple apps co-existing with each other and interact with each other.</p>
-<h2>The Concept</h2><h3>Simple idea:</h3><ul>
-<li>App is created via api <code>SimpleApp(name, config)</code>, e.g.<pre class="prettyprint source"><code>var app = SimpleApp('my-app', {
-  localStorageWrite: true,
-  localStorageRead: true,
-  partialRender: true
-});</code></pre></li>
-<li>App has one main component, and a number of elements underneath</li>
-<li>App.template keeps all templates for the app, it will have one <code>main</code> template, and numerous <code>sub</code> templates (elements)</li>
-<li>App.state keeps the state of each element</li>
-<li>App.data keeps all the data for each of the elements (NOTE: main template is just the layout, so there's no data necessary)</li>
-<li>state will be updated via user interaction, or codes</li>
-<li>whenever state is updated, a callback is fired and you may listen to the callback, e.g. <pre class="prettyprint source"><code>// listen to input_name field changes
-app.on(SimpleAppStateIsUpdated, 'input_name', function (data) {
-  console.log('state is updated');
-});</code></pre>and this is where you may choose to excute your own codes, or re-render the view</li>
-</ul>
-<h2>Build guides</h2><ul>
-<li>run <code>npm install</code> when you finish checking out the files</li>
-<li>run <code>npm run</code> to see the available options, or just:</li>
-<li>run <code>npm run watch</code> to watch the changes</li>
-<li>run <code>npm run server</code> to start the web server so you may access a local <code>localhost:8080/dist/simple.dev.js</code></li>
-</ul>
-<h2>Examples</h2><p>See http://coreorm.github.io/simple.js/ for complete guides and examples</p></article>
-    </section>
-
-
-
-
-
-
+<!-- Modal -->
+<div id="myModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        <p>One fine body…</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Feb 25 2016 18:03:25 GMT+1100 (AEDT) using the Minami theme.
-</footer>
-
-<script>prettyPrint();</script>
-<script src="scripts/linenumber.js"></script>
+<script src="js/simple.min.js"></script>
+<script src="js/jquery.js"></script>
+<script async src="js/bootstrap.min.js"></script>
+<script async src="js/micromarkdown.min.js"></script>
+<script async src="apps/nav.js"></script>
+<script>loadPage();</script>
 </body>
 </html>
