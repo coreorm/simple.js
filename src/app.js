@@ -178,7 +178,7 @@ app = function (name, cnf) {
    * callback registry
    * @type {{els: {}}}
    */
-  this.cr = {
+  this.callbacks = {
     sta: {},
     fin: {},
     wrd: {},
@@ -194,13 +194,13 @@ app = function (name, cnf) {
    * @param name
    * @returns {*}
    */
-  this.gc = function (type, name) {
+  this.getCallback = function (type, name) {
     if (name) {
-      if (typeof this.cr[type][name] == 'function') {
-        return this.cr[type][name];
+      if (typeof this.callbacks[type][name] == 'function') {
+        return this.callbacks[type][name];
       }
     } else {
-      return this.cr[type];
+      return this.callbacks[type];
     }
   };
 
@@ -211,9 +211,9 @@ app = function (name, cnf) {
    * @param callback
    */
   this.on = function (type, name, callback) {
-    if (typeof this.cr[type] == 'object') {
+    if (typeof this.callbacks[type] == 'object') {
       if (typeof callback == 'function') {
-        this.cr[type][name] = callback;
+        this.callbacks[type][name] = callback;
       }
     }
   };
@@ -223,7 +223,7 @@ app = function (name, cnf) {
    * @private
    */
   this._f = function (type) {
-    var calls = this.gc(type);
+    var calls = this.getCallback(type);
     if (typeof calls == 'object') {
       for (var k in calls) {
         var call = calls[k];
@@ -300,7 +300,7 @@ app = function (name, cnf) {
    */
   this.stateIsUpdated = function (data) {
     // callback by name
-    var c = this.gc('siu', data.name);
+    var c = this.getCallback('siu', data.name);
     if (typeof c == 'function') return c(data);
     return data;
   };
@@ -410,7 +410,7 @@ app = function (name, cnf) {
   this.parseElementData = function (elName, state, data, type, subNodeCnt) {
     if (!data) data = {};
     // check if callback is registered
-    var c = this.gc('ped', elName);
+    var c = this.getCallback('ped', elName);
     if (typeof c == 'function') return c(state, data);
     // prepare with attributes, allowed list (+ wildcar 'data-*', 'on*'):
     var d = {}, a = [];
@@ -575,7 +575,7 @@ app = function (name, cnf) {
       return '';
     }
     // if custom render function exists, use it.
-    var c = this.gc('rde', elName);
+    var c = this.getCallback('rde', elName);
     if (typeof c == 'function') return c(state, data);
     // is data changed? if not, do not render (when partial)
     if (_s(this.data[elName]) == _s(this.pData[elName])) {
