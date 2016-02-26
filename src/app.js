@@ -35,7 +35,11 @@ var vNode = function (src, parentNode) {
     console.log('ERROR:', e);
     return;
   }
-  // apis
+  /**
+   * insert to the left
+   * @param {object} node new node to insert before
+   * @param {object} [parent=null] parent node
+   */
   this.left = function (node, parent) {
     var targ = node;
     if (node instanceof vNode) targ = node.node;
@@ -46,6 +50,10 @@ var vNode = function (src, parentNode) {
       console.log('ERROR: vNode.left()', e);
     }
   };
+  /**
+   * insert to the right
+   * @param {object} [parent=null] parent node
+   */
   this.right = function (parent) {
     try {
       if (parent) this.parent = parent;
@@ -54,6 +62,10 @@ var vNode = function (src, parentNode) {
       console.log('ERROR: vNode.right()', e);
     }
   };
+  /**
+   * replace given node with self
+   * @param {object} node
+   */
   this.replace = function (node) {
     var targ = node;
     if (node instanceof vNode) targ = node.node;
@@ -64,6 +76,10 @@ var vNode = function (src, parentNode) {
       console.log('ERROR: vNode.replace()', e, node);
     }
   };
+  /**
+   * update node html
+   * @param {string} html
+   */
   this.updateHTML = function (html) {
     try {
       var n = this.parent.cloneNode(false);
@@ -75,9 +91,17 @@ var vNode = function (src, parentNode) {
       console.log('ERROR: vNode.updateHTML()', html, e);
     }
   };
+  /**
+   * append a single vNode
+   * @param {vNode} vNode
+   */
   this.appendVNode = function (vNode) {
     this.node.appendChild(vNode.node);
   };
+  /**
+   * append multiple vnodes
+   * @param {array} vNodes
+   */
   this.appendVNodes = function (vNodes) {
     var self = this;
     try {
@@ -143,7 +167,7 @@ var _c = function (obj) {
 /**
  * app base class
  * @param {string} name
- * @param {object} cnf
+ * @param {object} [cnf={}]
  */
 var app;
 app = function (name, cnf) {
@@ -160,12 +184,14 @@ app = function (name, cnf) {
   // state of the app
   this.state = {};
   this.pState = {};
-  // cnf default
+  /**
+   * config default
+   * no data, no render
+   */
   this.cnf = {
     localStorageWrite: true,
     localStorageRead: true,
-    partialRender: true,
-    skipEmptyData: true // if true, skip the template when data is empty
+    partialRender: true
   };
   // override with external cnf
   if (typeof cnf == 'object') {
@@ -191,7 +217,7 @@ app = function (name, cnf) {
   /**
    * get call by name and type
    * @param {string} type
-   * @param {string} name
+   * @param {string} [name=null]
    * @returns {*}
    */
   this.getCallback = function (type, name) {
@@ -237,7 +263,7 @@ app = function (name, cnf) {
   /**
    * update state of an element
    * @param {*} elementOrName, if value presents and this param is string, this will be a direct update
-   * @param {*} valueOrNull optional, if the first param is element with value, it will use that
+   * @param {*} [valueOrNull=Null] optional, if the first param is element with value, it will use that
    */
   this.updateState = function (elementOrName, valueOrNull) {
     var name, value, el;
@@ -308,7 +334,7 @@ app = function (name, cnf) {
    * template engine
    * @param {string} template
    * @param {object} data
-   * @param {boolean} doNotSkip if true, do not skip the undefined tags
+   * @param {boolean} [doNotSkip=true] if true, do not skip the undefined tags
    * @returns {*}
    */
   this.htpl = function (template, data, doNotSkip) {
@@ -406,7 +432,7 @@ app = function (name, cnf) {
    * @param {object} state
    * @param {object} data
    * @param {string} type
-   * @param {int} subNodeCnt if > 0, it's a sub node
+   * @param {int} [subNodeCnt=0] if > 0, it's a sub node
    * @returns {{}}
    */
   this.parseElementData = function (elName, state, data, type, subNodeCnt) {
@@ -485,7 +511,7 @@ app = function (name, cnf) {
   this.style = 'default';
   /**
    * render entire app
-   * @param {boolean} full if true, force a complete render
+   * @param {boolean} [full=false] if true, force a complete render
    *
    * RUN LOGIC:
    * 1. data changed for el?
@@ -711,7 +737,7 @@ app = function (name, cnf) {
   /**
    * init app
    * @param {string} container
-   * @param {boolean} autoRender
+   * @param {boolean} [autoRender=true]
    */
   this.init = function (container, autoRender) {
     if (container) this.container = container;
@@ -741,7 +767,7 @@ app = function (name, cnf) {
   /**
    * apis for fast access over data
    * @param {string} elName
-   * @param {int} nodePosition
+   * @param {int} [nodePosition=Null]
    * @returns {*}
    */
   this.d = function (elName, nodePosition) {
@@ -757,12 +783,20 @@ app = function (name, cnf) {
 /*------ export ------*/
 var z = {};
 /**
+ * THIS IS THE MAIN ENTRY POINT
+ *
  * create / retrieve a single app
+ *
+ * e.g.
+ * ```
+ * var app = SimpleApp('my-app');
+ * app.init(document.getElementById('app_container'), true);
+ * ```
  * @param {string} name
- * @param {object} config | note: this is the system config
+ * @param {object} [config={}] | note: this is the system config
  * @returns {SimpleApp}
  */
-w.SimpleApp = function (name, config) {
+var SimpleApp = function (name, config) {
   if (!z[name]) z[name] = new app(name, config);
   return z[name];
 };
