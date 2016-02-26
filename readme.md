@@ -1,6 +1,6 @@
 # {@link http://coreorm.github.io/simple.js|Simple.JS} 
 
-## Data-driven, Independent & Natively Implemented Javascript Application Library
+## Data-driven, Independent & Natively Implemented JavaScript Library for Applications
 
 * Not a framework: it's a library that is written in 100% native JS that supports all major browser versions, including IE9 and above.
 * Data-driven: instead of comparing virtual DOM (unlike reactJS), simple.js compares the data and only renders the element that has the data changed.
@@ -12,6 +12,7 @@
 * Web apps: Apps are setup independently, yet still able to communicate with each other.
 * Data-driven tables/charts
 * Single-page sites
+* and more...
 
 ## The Concept
 
@@ -37,9 +38,19 @@ app.on(SimpleAppStateIsUpdated, 'input_name', function (data) {
     console.log('state is updated');
 });
 ```
-and this is where you may choose to excute your own codes, or re-render the view
+and this is where you may choose to execute your own codes, or re-render the view
 
-## Build guides
+## Features
+
+* fast performance by targeted node operations based on data diff, not DOM diff (data structure is fixed, while DOM can change anytime).
+* support up to 2 levels of repetitive data rendering (and no deeper than that - as anything deeper the DOM operation will be expensive).
+* simple templates with style support (one element may have multiple styles).
+* data-driven, stateless application rendering.
+* independent, not relying on any framework - thus can be used side by side with any other framework.
+* applications are setup in private block-definitions (IIFE https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) to avoid conflict, yet they still can interact each other by `SimpleApp("name-of-app")`.
+* lazy/async load of apps is possible - since they are all independent.
+
+## Build Guides
 - run `npm install` when you finish checking out the files
 - run `npm run` to see the available options, or just:
 - run `npm run watch` to watch the changes
