@@ -1,0 +1,28 @@
+{
+  "name": "lp-simplejs",
+  "version": "1.0.0",
+  "description": "simple.js website",
+  "main": "index.html",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coreorm/simple.js.git"
+  },
+  "keywords": [
+    "simplejs"
+  ],
+  "author": "Bruce Beibei Li",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/coreorm/simple.js/issues"
+  },
+  "homepage": "https://github.com/coreorm/simple.js#readme",
+  "devDependencies": {
+    "minami": "^1.1.1"
+  }
+}

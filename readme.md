@@ -1,10 +1,17 @@
-# {@link http://coreorm.github.io/simple.js|Component-based Simple JS App Lib} 
+# {@link http://coreorm.github.io/simple.js|Simple.JS} 
 
-Simple.js is not a framework like Angular, it's a native JS library that's small (only 7K in size), and fast (render a complete 100x100 table under 1 second, and updating individual cells under 5 ms).
+## Data-driven, Independent & Natively Implemented Javascript Application Library
+
+* Not a framework: it's a library that is written in 100% native JS that supports all major browser versions, including IE9 and above.
+* Data-driven: instead of comparing virtual DOM (unlike reactJS), simple.js compares the data and only renders the element that has the data changed.
+* Small & nimble: before gzip, it's only 7K, and can be included in page source to save one extra network connection.
+* Fast: Render a complete 100x100 table under 1 second, and updating individual cells under 5 ms.
 
 ## What can you do with it?
 
-Build web apps, but not just one app, it supports multiple apps co-existing with each other and interact with each other.
+* Web apps: Apps are setup independently, yet still able to communicate with each other.
+* Data-driven tables/charts
+* Single-page sites
 
 ## The Concept
 
