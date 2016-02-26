@@ -27,7 +27,7 @@
   };
 
   app.template.main = {
-    default: '{hdr}<div class="container"> {designs}</div>'
+    default: '{hdr} {designs}'
   };
 
   app.template.sub = {

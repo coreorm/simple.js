@@ -78,8 +78,22 @@
       if (b) $('.modal-body').html(b);
       $('#myModal').modal('show');
     }
+    // converter
+    var converter = null;
+    // load page
+    function loadText(txt) {
+      if (!converter) converter = new showdown.Converter();
+      // retrieve
+      jQuery.get('txt/' + txt + '.md?' + Date.now(), function (src) {
+        document.getElementById('apps').innerHTML = converter.makeHtml(src);
+        // highlight
+        $('pre code').each(function(i, block) {
+          hljs.highlightBlock(block);
+        });
+      });
+    }
   </script>
-  <link href="theme/blog.css" rel="stylesheet" />
+  <link href="theme/ceru.css" rel="stylesheet"/>
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-static-top" id="nav"></nav>
@@ -104,8 +118,10 @@
 <script src="js/simple.min.js"></script>
 <script src="js/jquery.js"></script>
 <script async src="js/bootstrap.min.js"></script>
-<script async src="js/micromarkdown.min.js"></script>
+<script async src="js/showdown.min.js"></script>
 <script async src="apps/nav.js"></script>
 <script>loadPage();</script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
 </body>
 </html>
