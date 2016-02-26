@@ -588,7 +588,7 @@ app = function (name, cnf) {
     // figure out the type (from template._type)
     var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
 
-    if (typeof this.template.sub[elName] != 'object' || (oie(data) && this.cnf.skipEmptyData === true)) {
+    if (typeof this.template.sub[elName] != 'object' || oie(data)) {
       console.log('[Warning] No element template found or empty data for ' + elName);
       // decide whether to remove it from parent...
       if (this.cnf.partialRender && !forceRender) {
