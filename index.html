@@ -92,6 +92,16 @@
         });
       });
     }
+    // src
+    function src(href) {
+      return '<a title="View Source" href="' + href +
+        '" target="_blank" class="btn btn-warning btn-xs pull-right">' +
+        '<strong>&lt; src /&gt;</strong></a>';
+    }
+    function loadBtn(src) {
+      return '<a href="#" style="margin:0 6px;" class="pull-right btn btn-success btn-xs" ' +
+        'onclick="loadJs(\'' + src + '\', \'' + src + '\');return false">load it!</a>';
+    }
   </script>
   <link href="theme/paper.css" rel="stylesheet"/>
   <style>
@@ -111,13 +121,14 @@
 
     .example1 label,
     .example1 input,
-    .example1 button{
+    .example1 button {
       margin: 2px;
       padding: 2px 10px;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-size:13px;
+      font-size: 13px;
     }
-    .example1 label{
+
+    .example1 label {
       text-transform: capitalize;
     }
   </style>

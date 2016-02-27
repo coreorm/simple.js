@@ -9,8 +9,7 @@
   app.data = {
     hdr: {
       _text: 'App2: Cross App Interaction',
-      _link: '<a title="source" href="apps/app1.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
-      '<strong>&lt; src /&gt;</strong></a>'
+      _link: src('apps/app1.js')
     },
     bg: {
       element: [{
