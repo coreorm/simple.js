@@ -19,19 +19,20 @@
     row: {
       element: [
         {
-          title: 'Small and Nimble',
-          _content: 'The entire library is a 5k js file (before gzip), and you could even include it' +
+          title: 'Tiny in Size',
+          _content: 'The entire library is a 7k js file (before gzip), and you might as well include it' +
           ' directly in the html to save another HTTP connection'
         },
         {
-          title: 'Native yet Extensible',
+          title: 'Native Implementation',
           _content: 'There\'s absolutely no external JS lib required,' +
-          ' only native JS is used in the library, this means you may use it with any library of your own choice; '
+          ' only native JS is used in the library, this means you may use it with any other library/framework of your own choice; ' +
+          'Of course, being native also means great performance.'
         },
         {
-          title: 'Optimal Performance',
-          _content: 'No DOM operation is being performed in the app render, and each element is cached, ' +
-          'at the same time, it allows your own app.js to be loaded via defer or async to allow for parallel load.'
+          title: 'Speed, Speed, Speed!',
+          _content: 'First render is done via innerHTML to save DOM operations, ' +
+          'then any further rendering will try to use targeted node updates/replacements/removal to ensure optimal speed.'
         }
       ]
     }

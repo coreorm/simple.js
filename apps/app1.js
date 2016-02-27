@@ -74,12 +74,12 @@
     bg: {
       _type: 'select',
       // special input such as SELECT can have a wrapper, or think <tr></tr>, etc.
-      _wrapper: ['<label>background: <select {attr}>', '</select></label>'],
+      _wrapper: ['<label>Set page background: <select {attr}>', '</select></label>'],
       default: '<option {attr}>{label}</option>'
     },
     welcomeStyle: {
       _type: 'radio',
-      _wrapper: ['<span>render style: ', '</span>'],
+      _wrapper: ['<span>Change render style: ', '</span>'],
       default: '<label id="{id}"><input name="{name}" {selectState} value="{value}" ' +
       'type="radio" onclick="{action}"> {label} </label>'
     },
