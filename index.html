@@ -7,7 +7,7 @@
   <script>
     // default style
     window.defaultStyle = 'default';
-    window.btnStyle = 'primary';
+    window.btnStyle = 'info';
     // load JS
     var loadedJS = {};
     var loadedCSS = [];
@@ -87,16 +87,43 @@
       jQuery.get('txt/' + txt + '.md?' + Date.now(), function (src) {
         document.getElementById('apps').innerHTML = converter.makeHtml(src);
         // highlight
-        $('pre code').each(function(i, block) {
+        $('pre code').each(function (i, block) {
           hljs.highlightBlock(block);
         });
       });
     }
   </script>
-  <link href="theme/ceru.css" rel="stylesheet"/>
+  <link href="theme/paper.css" rel="stylesheet"/>
+  <style>
+    h1, h2, h3, h4, h5, h6, h7 {
+      color: #0c84e4;
+      /*font-weight: bold;*/
+    }
+
+    select, select.form-control {
+      padding: 2px 14px 2px 6px;
+    }
+
+    body {
+      margin-bottom: 100px;
+      font-size: 15px;
+    }
+
+    .example1 label,
+    .example1 input,
+    .example1 button{
+      margin: 2px;
+      padding: 2px 10px;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size:13px;
+    }
+    .example1 label{
+      text-transform: capitalize;
+    }
+  </style>
 </head>
 <body>
-<nav class="navbar navbar-inverse navbar-static-top" id="nav"></nav>
+<nav class="navbar navbar-inverse" id="nav"></nav>
 <div class="container" id="apps"></div>
 
 <!-- Modal -->
@@ -120,7 +147,12 @@
 <script async src="js/bootstrap.min.js"></script>
 <script async src="js/showdown.min.js"></script>
 <script async src="apps/nav.js"></script>
-<script>loadPage();</script>
+<script>
+  jQuery(window).on('hashchange', function () {
+    loadPage();
+  });
+  loadPage();
+</script>
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
 </body>

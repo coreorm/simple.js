@@ -102,7 +102,8 @@
     document.getElementById('apps').style.visibility = 'visible';
   });
 
-  app.init(document.getElementById('table'), true);
+  app.init(document.getElementById('table'), false);
+  app.render(true);
 
 
 })();

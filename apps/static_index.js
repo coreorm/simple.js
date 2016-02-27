@@ -10,7 +10,7 @@
       title: 'Welcome to Simple.JS',
       _link: '<a title="source" href="apps/static_index.js" target="_blank" class="btn btn-success btn-xs pull-right">' +
       '<strong>&lt; src /&gt;</strong></a>',
-      _content: 'Simple Web App Engine with no external dependencies'
+      _content: 'A simple, data-driven web application library and templating system. Natively implemented and offer great compatibility.'
     },
     welcome: {
       class: 'panel panel-' + window.defaultStyle,
