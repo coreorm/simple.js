@@ -28,7 +28,7 @@
     }
   };
   app.data.hdr = {
-    _lbl: 'Simple.js Examples',
+    _lbl: 'Simple.js Examples ' + src('pages/example.js'),
     style: 'margin-bottom:50px;'
   };
   app.data.examples = {};

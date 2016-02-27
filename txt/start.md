@@ -1,6 +1,15 @@
 # Getting Started
 
 ### Before you get started
+
+Head to [github project page](https://github.com/coreorm/simple.js/tree/master/dist), download the simple js file and include it in your page.
+* simple.dev.js will log the entire progress on the console, so use it for development;
+* simple.min.js is the minified version with all console logs turned off.
+
+To improve the page load performance, I'd suggest directly include the JS inline in your HTML template header, and save one extra connection.
+
+### Coding styles
+
 It is recommended to use IIFE style block definitions (see [here](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression)) for your apps to avoid namespace conflicts, well you can also use anything you like, really.
 
 For example, to create a new app, wrap it in IIFE callback so it's all private:
@@ -222,6 +231,17 @@ or
 app.init(document.getElementById('app_container'), false);
 // then run render to render it
 app.render();
+```
+
+With the latter one, it goes without saying that you'll need to have your `app_container` div somewhere, e.g.
+```
+<html>
+    ...
+    <body>
+        ...
+        <div id="app_container"></div>
+    </body>
+</html>
 ```
 
 #### Finish (really)

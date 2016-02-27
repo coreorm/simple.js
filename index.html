@@ -7,7 +7,8 @@
   <script>
     // default style
     window.defaultStyle = 'default';
-    window.btnStyle = 'info';
+    window.btnStyle = 'primary';
+    window.srcStyle = 'info';
     // load JS
     var loadedJS = {};
     var loadedCSS = [];
@@ -95,11 +96,11 @@
     // src
     function src(href) {
       return '<a title="View Source" href="' + href +
-        '" target="_blank" class="btn btn-warning btn-xs pull-right">' +
+        '" target="_blank" class="btn btn-' + window.srcStyle + ' btn-xs pull-right">' +
         '<strong>&lt; src /&gt;</strong></a>';
     }
     function loadBtn(src) {
-      return '<a href="#" style="margin:0 6px;" class="pull-right btn btn-success btn-xs" ' +
+      return '<a href="#" style="margin:0 6px;" class="pull-right btn btn-' + window.btnStyle + ' btn-xs" ' +
         'onclick="loadJs(\'' + src + '\', \'' + src + '\');return false">load it!</a>';
     }
   </script>
