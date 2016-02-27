@@ -56,7 +56,7 @@
       },
       {
         value: 'master',
-        _label: 'Mr.'
+        _label: 'Mr. (Master)'
       },
       {
         value: 'doctor',
