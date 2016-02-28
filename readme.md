@@ -22,8 +22,7 @@
 var app = SimpleApp('my-app', {
     localStorageWrite: true,
     localStorageRead: true,
-    partialRender: true,
-    skipEmptyData: true
+    partialRender: true
 });
 ```
 * App has one main component, and a number of elements underneath
