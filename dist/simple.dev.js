@@ -804,7 +804,6 @@ var SimpleApp = function (name, config) {
 // nodejs compatible
 if (typeof exports != 'undefined') {
   exports.SimpleApp = w.SimpleApp;
-  exports.SimpleEvent = w.SimpleEvent;
 }
 })
 (this);
