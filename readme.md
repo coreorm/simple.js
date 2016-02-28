@@ -1,6 +1,4 @@
-# Simple.JS
-
-# {@link http://coreorm.github.io/simple.js|Simple.JS} 
+# [Simple.JS](http://coreorm.github.io/simple.js)
 
 ## Data-driven, Independent & Natively Implemented JavaScript Library for Applications
 
