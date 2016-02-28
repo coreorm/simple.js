@@ -1,11 +1,13 @@
 # Simple.JS
 
+# {@link http://coreorm.github.io/simple.js|Simple.JS} 
+
 ## Data-driven, Independent & Natively Implemented JavaScript Library for Applications
 
 * Not a framework: it's a library that is written in 100% native JS that supports all major browser versions, including IE9 and above.
 * Data-driven: instead of comparing virtual DOM (unlike reactJS), simple.js compares the data and only renders the element that has the data changed.
 * Small & nimble: before gzip, it's only 7K, and can be included in page source to save one extra network connection.
-* Fast: Render a complete 100x100 table under 1 second, and updating individual cells under 5 ms.
+* Fast: Render a complete 100x100 table under 1 second (on my 9 year old imac), and updating individual cells under 5 ms.
 
 ## What can you do with it?
 
@@ -31,6 +33,7 @@ var app = SimpleApp('my-app', {
 * App.data keeps all the data for each of the elements (NOTE: main template is just the layout, so there's no data necessary)
 * state will be updated via user interaction, or codes
 * whenever state is updated, a callback is fired and you may listen to the callback, e.g. 
+* api `render()` will render the template using current data, and if it's not the initial render, it will compare the current data with new data, and try to use partial render for optimal speed.
 ```
 // listen to input_name field changes
 app.on(SimpleAppStateIsUpdated, 'input_name', function (data) {
@@ -56,4 +59,6 @@ and this is where you may choose to execute your own codes, or re-render the vie
 - run `npm run server` to start the web server so you may access a local `localhost:8080/dist/simple.dev.js`
 
 ## Examples
-See http://coreorm.github.io/simple.js/ for complete guides and examples
+See http://coreorm.github.io/simple.js for complete guides and examples
+
+
