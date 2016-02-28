@@ -796,7 +796,7 @@ var z = {};
  * @param {object} [config={}] | note: this is the system config
  * @returns {SimpleApp}
  */
-var SimpleApp = function (name, config) {
+w.SimpleApp = function (name, config) {
   if (!z[name]) z[name] = new app(name, config);
   return z[name];
 };
