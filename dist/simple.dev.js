@@ -172,7 +172,8 @@ function _c(obj) {
  */
 var app;
 app = function (name, cnf) {
-  this.version = '1.02';
+  // current version from build
+  this.version = '1.0.3';
   this.aName = name;
   // defaults
   name = _s(name).hashCode();
@@ -806,5 +807,6 @@ w.SimpleApp = function (name, config) {
 if (typeof exports != 'undefined') {
   exports.SimpleApp = w.SimpleApp;
 }
+
 })
 (this);
