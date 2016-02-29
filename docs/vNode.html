@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>vNode.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="app.html">
+                  app.js
+                </a>
+              
+                
+                <a class="source" href="vNode.html">
+                  vNode.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>vNode.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/**
+ * virtual node
+ * @param {string} src
+ * @param {object} parentNode
+ */</span>
+vNode = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">src, parentNode</span>) </span>{
+  <span class="hljs-keyword">this</span>.src = src;
+  parentNode = parentNode || <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+  <span class="hljs-keyword">this</span>.parent = parentNode;
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">var</span> n = <span class="hljs-keyword">this</span>.parent.cloneNode(<span class="hljs-literal">false</span>);
+    n.innerHTML = <span class="hljs-keyword">this</span>.src;
+    <span class="hljs-keyword">this</span>.node = n.firstChild;
+  } <span class="hljs-keyword">catch</span> (e) {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'ERROR:'</span>, e);
+    <span class="hljs-keyword">return</span>;
+  }
+  <span class="hljs-comment">/**
+   * insert to the left
+   * @param {object} node new node to insert before
+   * @param {object} [parent=null] parent node
+   */</span>
+  <span class="hljs-keyword">this</span>.left = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">node, parent</span>) </span>{
+    <span class="hljs-keyword">var</span> targ = node;
+    <span class="hljs-keyword">if</span> (node <span class="hljs-keyword">instanceof</span> vNode) targ = node.node;
+    <span class="hljs-keyword">if</span> (parent) <span class="hljs-keyword">this</span>.parent = parent;
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">this</span>.parent.insertBefore(<span class="hljs-keyword">this</span>.node, targ);
+    } <span class="hljs-keyword">catch</span> (e) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'ERROR: vNode.left()'</span>, e);
+    }
+  };
+  <span class="hljs-comment">/**
+   * insert to the right
+   * @param {object} [parent=null] parent node
+   */</span>
+  <span class="hljs-keyword">this</span>.right = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">parent</span>) </span>{
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">if</span> (parent) <span class="hljs-keyword">this</span>.parent = parent;
+      <span class="hljs-keyword">this</span>.parent.appendChild(<span class="hljs-keyword">this</span>.node);
+    } <span class="hljs-keyword">catch</span> (e) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'ERROR: vNode.right()'</span>, e);
+    }
+  };
+  <span class="hljs-comment">/**
+   * replace given node with self
+   * @param {object} node
+   */</span>
+  <span class="hljs-keyword">this</span>.replace = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">node</span>) </span>{
+    <span class="hljs-keyword">var</span> targ = node;
+    <span class="hljs-keyword">if</span> (node <span class="hljs-keyword">instanceof</span> vNode) targ = node.node;
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">this</span>.parent = node.parentNode;
+      <span class="hljs-keyword">this</span>.parent.replaceChild(<span class="hljs-keyword">this</span>.node, targ);
+    } <span class="hljs-keyword">catch</span> (e) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'ERROR: vNode.replace()'</span>, e, node);
+    }
+  };
+  <span class="hljs-comment">/**
+   * update node html
+   * @param {string} html
+   */</span>
+  <span class="hljs-keyword">this</span>.updateHTML = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">html</span>) </span>{
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">var</span> n = <span class="hljs-keyword">this</span>.parent.cloneNode(<span class="hljs-literal">false</span>);
+      <span class="hljs-keyword">var</span> oldNode = <span class="hljs-keyword">this</span>.node;
+      n.innerHTML = html;
+      <span class="hljs-keyword">this</span>.node = n.firstChild;
+      <span class="hljs-keyword">this</span>.parent.replaceChild(<span class="hljs-keyword">this</span>.node, oldNode);
+    } <span class="hljs-keyword">catch</span> (e) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'ERROR: vNode.updateHTML()'</span>, html, e);
+    }
+  };
+  <span class="hljs-comment">/**
+   * append a single vNode
+   * @param {vNode} vNode
+   */</span>
+  <span class="hljs-keyword">this</span>.appendVNode = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">vNode</span>) </span>{
+    <span class="hljs-keyword">this</span>.node.appendChild(vNode.node);
+  };
+  <span class="hljs-comment">/**
+   * append multiple vnodes
+   * @param {array} vNodes
+   */</span>
+  <span class="hljs-keyword">this</span>.appendVNodes = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">vNodes</span>) </span>{
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">try</span> {
+      vNodes.map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el</span>) </span>{
+        self.node.appendChild(el.node);
+      });
+    } <span class="hljs-keyword">catch</span> (e) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'ERROR: vNode.appendVNodes()'</span>, e);
+    }
+  };
+  <span class="hljs-keyword">this</span>.remove = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">this</span>.node.remove();
+  };
+};</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

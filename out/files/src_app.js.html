@@ -2,45 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>app.js - Documentation</title>
-
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <title>src/app.js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
 </head>
-<body>
+<body class="yui3-skin-sam">
 
-<input type="checkbox" id="nav-trigger" class="nav-trigger" />
-<label for="nav-trigger" class="navicon-button x">
-  <div class="navicon"></div>
-</label>
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: </em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
 
-<label for="nav-trigger" class="overlay"></label>
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: src/app.js</h1>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#_c">_c</a></li><li><a href="global.html#_f">_f</a></li><li><a href="global.html#_s">_s</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#appendVNode">appendVNode</a></li><li><a href="global.html#appendVNodes">appendVNodes</a></li><li><a href="global.html#callbacks">callbacks</a></li><li><a href="global.html#cnf">cnf</a></li><li><a href="global.html#d">d</a></li><li><a href="global.html#d2e">d2e</a></li><li><a href="global.html#data">data</a></li><li><a href="global.html#eId">eId</a></li><li><a href="global.html#els">els</a></li><li><a href="global.html#getCallback">getCallback</a></li><li><a href="global.html#htpl">htpl</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#left">left</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#ms">ms</a></li><li><a href="global.html#node">node</a></li><li><a href="global.html#oie">oie</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#parseElementData">parseElementData</a></li><li><a href="global.html#pData">pData</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#renderElement">renderElement</a></li><li><a href="global.html#replace">replace</a></li><li><a href="global.html#right">right</a></li><li><a href="global.html#stateIsUpdated">stateIsUpdated</a></li><li><a href="global.html#store">store</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#template">template</a></li><li><a href="global.html#toQuerystring">toQuerystring</a></li><li><a href="global.html#updateHTML">updateHTML</a></li><li><a href="global.html#updateState">updateState</a></li><li><a href="global.html#vNode">vNode</a></li></ul>
-</nav>
-
-<div id="main">
-    
-    <h1 class="page-title">app.js</h1>
-    
-
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/*jslint browser: true*/
+<div class="file">
+    <pre class="code prettyprint linenums">
+/*jslint browser: true*/
 /*jslint node: true */
-'use strict';
+&#x27;use strict&#x27;;
 var w = window;
 /**
  * current mini seconds
@@ -70,13 +111,13 @@ function d2e(id) {
 /**
  * Events available
  */
-w.SimpleAppStart = 'sta';
-w.SimpleAppFinish = 'fin';
-w.SimpleAppWillRender = 'wrd';
-w.SimpleAppDidRender = 'drd';
-w.SimpleAppRenderElement = 'rde';
-w.SimpleAppParseElementData = 'ped';
-w.SimpleAppStateIsUpdated = 'siu';
+w.SimpleAppStart = &#x27;sta&#x27;;
+w.SimpleAppFinish = &#x27;fin&#x27;;
+w.SimpleAppWillRender = &#x27;wrd&#x27;;
+w.SimpleAppDidRender = &#x27;drd&#x27;;
+w.SimpleAppRenderElement = &#x27;rde&#x27;;
+w.SimpleAppParseElementData = &#x27;ped&#x27;;
+w.SimpleAppStateIsUpdated = &#x27;siu&#x27;;
 
 // lib
 String.prototype.hashCode = function () {
@@ -115,12 +156,12 @@ app = function (name, cnf) {
   this.aName = name;
   // defaults
   name = _s(name).hashCode();
-  var prefix = '_sj_' + name;
+  var prefix = &#x27;_sj_&#x27; + name;
   this.name = name;
   // register app
   w[prefix] = this;
   // local storage key
-  this.localStorageKey = prefix + '_data';
+  this.localStorageKey = prefix + &#x27;_data&#x27;;
   this.container = null;
   // state of the app
   this.state = {};
@@ -135,7 +176,7 @@ app = function (name, cnf) {
     partialRender: true
   };
   // override with external cnf
-  if (typeof cnf == 'object') {
+  if (typeof cnf == &#x27;object&#x27;) {
     for (var k in cnf) {
       this.cnf[k] = cnf[k];
     }
@@ -163,7 +204,7 @@ app = function (name, cnf) {
    */
   this.getCallback = function (type, name) {
     if (name) {
-      if (typeof this.callbacks[type][name] == 'function') {
+      if (typeof this.callbacks[type][name] == &#x27;function&#x27;) {
         return this.callbacks[type][name];
       }
     } else {
@@ -178,8 +219,8 @@ app = function (name, cnf) {
    * @param {function} callback
    */
   this.on = function (type, name, callback) {
-    if (typeof this.callbacks[type] == 'object') {
-      if (typeof callback == 'function') {
+    if (typeof this.callbacks[type] == &#x27;object&#x27;) {
+      if (typeof callback == &#x27;function&#x27;) {
         this.callbacks[type][name] = callback;
       }
     }
@@ -191,11 +232,11 @@ app = function (name, cnf) {
    */
   this._f = function (type) {
     var calls = this.getCallback(type);
-    if (typeof calls == 'object') {
+    if (typeof calls == &#x27;object&#x27;) {
       for (var k in calls) {
         var call = calls[k];
-        if (typeof call == 'function') {
-          console.log('>> calls - ' + k, calls);
+        if (typeof call == &#x27;function&#x27;) {
+          console.log(&#x27;&gt;&gt; calls - &#x27; + k, calls);
           call();
         }
       }
@@ -208,39 +249,39 @@ app = function (name, cnf) {
    */
   this.updateState = function (elementOrName, valueOrNull) {
     var name, value, el;
-    if (typeof elementOrName == 'string') {
-      console.log('=> update state by name/value', elementOrName, valueOrNull);
+    if (typeof elementOrName == &#x27;string&#x27;) {
+      console.log(&#x27;=&gt; update state by name/value&#x27;, elementOrName, valueOrNull);
       name = elementOrName;
       value = valueOrNull;
       this.state[elementOrName] = valueOrNull;
-    } else if (typeof elementOrName == 'object' &amp;&amp; typeof elementOrName.nodeName == 'string') {
-      console.log('=> update state by element', elementOrName);
+    } else if (typeof elementOrName == &#x27;object&#x27; &amp;&amp; typeof elementOrName.nodeName == &#x27;string&#x27;) {
+      console.log(&#x27;=&gt; update state by element&#x27;, elementOrName);
       // must be object
       el = elementOrName;
       var nodeName = el.nodeName;
       var type = el.type;
-      if (nodeName == 'SELECT') {
-        type = 'select';
+      if (nodeName == &#x27;SELECT&#x27;) {
+        type = &#x27;select&#x27;;
       }
       name = el.name;
       value = el.value;
       switch (type) {
-        case 'select':
-        case 'text':
-        case 'radio':
+        case &#x27;select&#x27;:
+        case &#x27;text&#x27;:
+        case &#x27;radio&#x27;:
           this.state[name] = value;
           break;
-        case 'checkbox':
+        case &#x27;checkbox&#x27;:
           if (!this.state[name]) {
             this.state[name] = [];
           }
-          if (el.checked &amp;&amp; value.length > 0) {
+          if (el.checked &amp;&amp; value.length &gt; 0) {
             if (this.state[name].indexOf(value) &lt; 0) {
               this.state[name].push(value);
             }
           } else {
             var pos = this.state[name].indexOf(value);
-            if (pos >= 0) {
+            if (pos &gt;= 0) {
               this.state[name].splice(pos, 1);
             }
           }
@@ -267,8 +308,8 @@ app = function (name, cnf) {
    */
   this.stateIsUpdated = function (data) {
     // callback by name
-    var c = this.getCallback('siu', data.name);
-    if (typeof c == 'function') return c(data);
+    var c = this.getCallback(&#x27;siu&#x27;, data.name);
+    if (typeof c == &#x27;function&#x27;) return c(data);
     return data;
   };
   /**
@@ -283,24 +324,24 @@ app = function (name, cnf) {
     try {
       var output = template;
       for (var n in data) {
-        if (n.length > 0) {
-          var search = new RegExp('{' + n + '}', 'g'), rep = data[n];
+        if (n.length &gt; 0) {
+          var search = new RegExp(&#x27;{&#x27; + n + &#x27;}&#x27;, &#x27;g&#x27;), rep = data[n];
           output = output.replace(search, rep);
         }
       }
       // clean final output
-      if (doNotSkip !== true) output = output.replace(/{[^&lt;>}]+}/ig, '').replace(/{>([^}]+)}/ig, '{$1}');
+      if (doNotSkip !== true) output = output.replace(/{[^&lt;&gt;}]+}/ig, &#x27;&#x27;).replace(/{&gt;([^}]+)}/ig, &#x27;{$1}&#x27;);
       return output;
     } catch (e) {
-      console.log('[Error] html template failure', e);
-      return '';
+      console.log(&#x27;[Error] html template failure&#x27;, e);
+      return &#x27;&#x27;;
     }
   };
   /**
    * store state in local storage
    */
   this.store = function () {
-    if (this.cnf.localStorageWrite &amp;&amp; typeof w.localStorage == 'object') {
+    if (this.cnf.localStorageWrite &amp;&amp; typeof w.localStorage == &#x27;object&#x27;) {
       w.localStorage.setItem(this.localStorageKey, _s(this.state));
     }
   };
@@ -308,22 +349,22 @@ app = function (name, cnf) {
    * retrieve state from local storage
    */
   this.load = function () {
-    if (this.cnf.localStorageRead &amp;&amp; typeof w.localStorage == 'object') {
+    if (this.cnf.localStorageRead &amp;&amp; typeof w.localStorage == &#x27;object&#x27;) {
       var d = w.localStorage.getItem(this.localStorageKey);
       if (!d) return;
       try {
         this.state = JSON.parse(d);
       } catch (e) {
-        console.log('[ERROR] Unable to parse state ' + d, e);
+        console.log(&#x27;[ERROR] Unable to parse state &#x27; + d, e);
       }
     }
   };
   /*------ elements cnf ------*/
   /**
    * template: must have default template, or render will return empty string
-   * if 'selected' template is available, when data fits in the current state, it will use selected state
+   * if &#x27;selected&#x27; template is available, when data fits in the current state, it will use selected state
    * within template, use
-   * {__s} for save state calls, e.g. {__s}('foo', 'bar') or {__s}s(this) for elements
+   * {__s} for save state calls, e.g. {__s}(&#x27;foo&#x27;, &#x27;bar&#x27;) or {__s}s(this) for elements
    * @type {{main: {}, sub: {}}}
    */
   this.template = {main: {}, sub: {}};
@@ -348,16 +389,16 @@ app = function (name, cnf) {
   this.els = function (elName, state, data) {
     // is there style in template setting already?
     if (data._style) {
-      console.log('>>> Style for ' + elName + ': ' + data._style);
+      console.log(&#x27;&gt;&gt;&gt; Style for &#x27; + elName + &#x27;: &#x27; + data._style);
       return data._style;
     }
     // otherwise, default
     if (state) {
       var s = _s(state);
       var v = _s(data.value);
-      return (s.indexOf(v) >= 0) ? 'selected' : 'default';
+      return (s.indexOf(v) &gt;= 0) ? &#x27;selected&#x27; : &#x27;default&#x27;;
     }
-    return 'default';
+    return &#x27;default&#x27;;
   };
   /**
    * generate element id
@@ -365,7 +406,7 @@ app = function (name, cnf) {
    * @returns {string}
    */
   this.eId = function (elName) {
-    return prefix + '_el_' + elName;
+    return prefix + &#x27;_el_&#x27; + elName;
   };
   /**
    * callback: custom data parser
@@ -373,33 +414,33 @@ app = function (name, cnf) {
    * @param {object} state
    * @param {object} data
    * @param {string} type
-   * @param {int} [subNodeCnt=0] if > 0, it's a sub node
+   * @param {int} [subNodeCnt=0] if &gt; 0, it&#x27;s a sub node
    * @returns {{}}
    */
   this.parseElementData = function (elName, state, data, type, subNodeCnt) {
     if (!data) data = {};
     // check if callback is registered
-    var c = this.getCallback('ped', elName);
-    if (typeof c == 'function') return c(state, data);
-    // prepare with attributes, allowed list (+ wildcar 'data-*', 'on*'):
+    var c = this.getCallback(&#x27;ped&#x27;, elName);
+    if (typeof c == &#x27;function&#x27;) return c(state, data);
+    // prepare with attributes, allowed list (+ wildcar &#x27;data-*&#x27;, &#x27;on*&#x27;):
     var d = {}, a = [];
     data.name = elName;
 
-    if (subNodeCnt > 0) {
-      if (type != 'select') {
-        if (!data.id) data.id = this.eId(elName + '_' + subNodeCnt);
+    if (subNodeCnt &gt; 0) {
+      if (type != &#x27;select&#x27;) {
+        if (!data.id) data.id = this.eId(elName + &#x27;_&#x27; + subNodeCnt);
       }
     } else {
       if (!data.id) data.id = this.eId(elName);
     }
     // generate on[change] by type
-    var act = prefix + '.updateState(this)';
+    var act = prefix + &#x27;.updateState(this)&#x27;;
     if (!subNodeCnt) {
       switch (type) {
-        case 'select':
+        case &#x27;select&#x27;:
           data.onchange = act;
           break;
-        case 'input':
+        case &#x27;input&#x27;:
           data.onkeyup = act;
           if (!data.value) {
             data.value = state;
@@ -410,30 +451,30 @@ app = function (name, cnf) {
           break;
       }
     }
-    d.selectState = '';
+    d.selectState = &#x27;&#x27;;
     // select
-    if (subNodeCnt > 0 &amp;&amp; _s(state).indexOf(_s(data.value)) >= 0) {
-      console.log('check select: ' + state + ' &lt;> ' + data.value);
-      if (type == 'select') {
-        data.selected = 'selected';
-        d.selectState = 'selected="selected"';
+    if (subNodeCnt &gt; 0 &amp;&amp; _s(state).indexOf(_s(data.value)) &gt;= 0) {
+      console.log(&#x27;check select: &#x27; + state + &#x27; &lt;&gt; &#x27; + data.value);
+      if (type == &#x27;select&#x27;) {
+        data.selected = &#x27;selected&#x27;;
+        d.selectState = &#x27;selected=&quot;selected&quot;&#x27;;
       }
-      if (type == 'checkbox' || type == 'radio') {
-        data.checked = 'checked';
-        d.selectState = 'checked="checked"';
+      if (type == &#x27;checkbox&#x27; || type == &#x27;radio&#x27;) {
+        data.checked = &#x27;checked&#x27;;
+        d.selectState = &#x27;checked=&quot;checked&quot;&#x27;;
       }
     }
 
     for (var i in data) {
       d[i] = data[i];
       // rule: all custom variables must start with _, others will be treated as attributes
-      if (i.indexOf('_') &lt; 0) {
-        a.push(i + '="' + data[i] + '"');
+      if (i.indexOf(&#x27;_&#x27;) &lt; 0) {
+        a.push(i + &#x27;=&quot;&#x27; + data[i] + &#x27;&quot;&#x27;);
       }
     }
-    d.attr = a.join(' ');
+    d.attr = a.join(&#x27; &#x27;);
     d.action = act;
-    if (elName == 'welcomeStyle') console.log('>>> parseElementData', d);
+    if (elName == &#x27;welcomeStyle&#x27;) console.log(&#x27;&gt;&gt;&gt; parseElementData&#x27;, d);
     return d;
   };
   /**
@@ -449,7 +490,7 @@ app = function (name, cnf) {
    * main template style
    * @type {string}
    */
-  this.style = 'default';
+  this.style = &#x27;default&#x27;;
   /**
    * render entire app
    * @param {boolean} [full=false] if true, force a complete render
@@ -467,42 +508,42 @@ app = function (name, cnf) {
    *      1.1.1 is the data empty?
    *        YES: vNode.remove()
    *        NO: vNode.updateHTML()
-   *  1.2 yes it's a wrapper
+   *  1.2 yes it&#x27;s a wrapper
    *    1.2.0 is vNode non-existent?
    *      YES: new vNode plus children
    *      NO: go to next
    *    1.2.1 loop thru children:
    *      with each child:
-   *      new data count > old data count?
+   *      new data count &gt; old data count?
    *      YES:
    *        vNode exists?
-   *          YES: vNode.updateHTML() - no need to remove anything (so order doesn't really matter)
+   *          YES: vNode.updateHTML() - no need to remove anything (so order doesn&#x27;t really matter)
    *          NO: new vNode, vNode.right(parent);
    *     NO:
    *        count vNode and remove ones that are not in vNode.remove()
    */
   this.render = function (full) {
     var stime = ms();
-    console.log('=> Start Rendering ' + this.aName);
-    this._f('wrd');
-    if (!this.container) throw new Error('Invalid container specified');
+    console.log(&#x27;=&gt; Start Rendering &#x27; + this.aName);
+    this._f(&#x27;wrd&#x27;);
+    if (!this.container) throw new Error(&#x27;Invalid container specified&#x27;);
     // findout main template details
     var t = this.template.main[this.style];
     var d = {};
-    if (!t) throw new Error('Invalid master template for style: ' + this.style);
+    if (!t) throw new Error(&#x27;Invalid master template for style: &#x27; + this.style);
     // logic: force render clears prevData, and that, is that.
     if (full === true) this.pData = {};
     // verify data presence
     if (oie(this.data) || _s(this.pData) == _s(this.data)) {
       // nothing to render - data is empty, or data is unchanged
-      console.log('No data found, nothing will be rendered');
+      console.log(&#x27;No data found, nothing will be rendered&#x27;);
       return;
     }
     // set control: force render
     var forceRender = oie(this.pData);
     // start loop and render (and pass forceRender if necessary)
     for (var n in this.template.sub) {
-      console.log('=> Render sub: ' + n);
+      console.log(&#x27;=&gt; Render sub: &#x27; + n);
       var tmp = this.renderElement(n, forceRender);
       if (tmp) d[n] = tmp;
     }
@@ -515,8 +556,8 @@ app = function (name, cnf) {
     // also make previous data the same as current data in elements
     this.pData = _c(this.data);
     // callback
-    this._f('drd');
-    console.log('=> Finish Rendering in ' + (ms() - stime) + ' ms');
+    this._f(&#x27;drd&#x27;);
+    console.log(&#x27;=&gt; Finish Rendering in &#x27; + (ms() - stime) + &#x27; ms&#x27;);
   };
   /**
    * render single element
@@ -527,25 +568,25 @@ app = function (name, cnf) {
   this.renderElement = function (elName, forceRender) {
     forceRender = (forceRender === true);
     // figure out the type (from template._type)
-    var data = this.data[elName] || {}, state = this.state[elName] || '', output = '';
+    var data = this.data[elName] || {}, state = this.state[elName] || &#x27;&#x27;, output = &#x27;&#x27;;
 
-    if (typeof this.template.sub[elName] != 'object' || oie(data)) {
-      console.log('[Warning] No element template found or empty data for ' + elName);
+    if (typeof this.template.sub[elName] != &#x27;object&#x27; || oie(data)) {
+      console.log(&#x27;[Warning] No element template found or empty data for &#x27; + elName);
       // decide whether to remove it from parent...
       if (this.cnf.partialRender &amp;&amp; !forceRender) {
         var existingNode = this.node(elName);
         if (existingNode) {
-          console.log('No data found, remove node');
+          console.log(&#x27;No data found, remove node&#x27;);
           existingNode.parentNode.removeChild(existingNode);
           return false;
         }
       }
 
-      return '';
+      return &#x27;&#x27;;
     }
     // if custom render function exists, use it.
-    var c = this.getCallback('rde', elName);
-    if (typeof c == 'function') return c(state, data);
+    var c = this.getCallback(&#x27;rde&#x27;, elName);
+    if (typeof c == &#x27;function&#x27;) return c(state, data);
     // is data changed? if not, do not render (when partial)
     if (_s(this.data[elName]) == _s(this.pData[elName])) {
       return false;
@@ -555,7 +596,7 @@ app = function (name, cnf) {
     var t = this.template.sub[elName], type = t._type;
     var self = this;
     if (t._wrapper) {
-      // logic: same or less -> vNode.updateHTML || vNode.remove(), more? vNode.right();
+      // logic: same or less -&gt; vNode.updateHTML || vNode.remove(), more? vNode.right();
       if (!data.wrapper) data.wrapper = {};
       // render as wrapper
       var wAttr = this.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = 0;
@@ -577,9 +618,9 @@ app = function (name, cnf) {
         var si = self.els(elName, state, di);
         var ti = self.template.sub[elName][si];
         var datai = self.parseElementData(elName, state, di, t._type, m);
-        if (!ti) ti = self.template.sub[elName]['default'];
+        if (!ti) ti = self.template.sub[elName][&#x27;default&#x27;];
         // is it select type?
-        if (t._type == 'select') {
+        if (t._type == &#x27;select&#x27;) {
           // just render and go
           output += self.htpl(ti, datai);
           return;
@@ -594,7 +635,7 @@ app = function (name, cnf) {
             // nothing is changed, do not render
             return;
           }
-          var node = self.node(elName + '_' + m);
+          var node = self.node(elName + &#x27;_&#x27; + m);
           if (!nodeParent) nodeParent = node.parentNode;
           // partial render here
           src = self.htpl(ti, datai);
@@ -611,7 +652,7 @@ app = function (name, cnf) {
                 vn = new vNode(src, nodeParent);
                 vn.right();
               } else {
-                console.log('[ERROR] unable to find node parent, can not append');
+                console.log(&#x27;[ERROR] unable to find node parent, can not append&#x27;);
               }
             }
           }
@@ -622,32 +663,32 @@ app = function (name, cnf) {
         }
       });
       // removal when 1. nodeParent, 2. elPData exists
-      if (nodeParent &amp;&amp; prevElementData.length > elData.length) {
+      if (nodeParent &amp;&amp; prevElementData.length &gt; elData.length) {
         prevElementData.map(function (el, item) {
-            if (item >= m) {
-              var node = self.node(elName + '_' + item);
+            if (item &gt;= m) {
+              var node = self.node(elName + &#x27;_&#x27; + item);
               // remove childnode
-              console.log('Remove child: ' + item);
+              console.log(&#x27;Remove child: &#x27; + item);
               if (node) nodeParent.removeChild(node);
             }
           }
         );
       }
 
-      if (typeof output == 'string' &amp;&amp; output.length > 1) {
+      if (typeof output == &#x27;string&#x27; &amp;&amp; output.length &gt; 1) {
         output = self.htpl(t._wrapper[0], wAttr) + output + t._wrapper[1];
       } else {
-        // stop here as it's replaced
-        console.log('=> Render Element [' + elName + ']: using DOM.');
+        // stop here as it&#x27;s replaced
+        console.log(&#x27;=&gt; Render Element [&#x27; + elName + &#x27;]: using DOM.&#x27;);
         return false;
       }
     } else {
       // single tag element - it should never be empty really - but lets work on it
-      console.log('>>> render [' + elName + '] as a whole');
+      console.log(&#x27;&gt;&gt;&gt; render [&#x27; + elName + &#x27;] as a whole&#x27;);
       var si = this.els(elName, state, data);
       var ti = this.template.sub[elName][si];
       var datai = this.parseElementData(elName, state, data, t._type);
-      if (!ti) ti = this.template.sub[elName]['default'];
+      if (!ti) ti = this.template.sub[elName][&#x27;default&#x27;];
       output = this.htpl(ti, datai);
     }
     // logic: if node exists, replace html, otherwise, return it
@@ -661,7 +702,7 @@ app = function (name, cnf) {
         return false;
       }
     }
-    // 2nd - it must be partial and if node doesn't exists, return itself, otherwise, update by replacing node
+    // 2nd - it must be partial and if node doesn&#x27;t exists, return itself, otherwise, update by replacing node
     if (!forceRender &amp;&amp; this.cnf.partialRender === true &amp;&amp; output) {
       var node = this.node(elName), nn = null;
       // replace
@@ -686,9 +727,9 @@ app = function (name, cnf) {
     this.load();
     if (autoRender === false) return;
     // next, render
-    this._f('sta');
+    this._f(&#x27;sta&#x27;);
     this.render();
-    this._f('fin');
+    this._f(&#x27;fin&#x27;);
   };
 
   /**
@@ -700,10 +741,10 @@ app = function (name, cnf) {
     for (var n in this.state) {
       var v = this.state[n];
       if (v) {
-        qs.push(n + '=' + v);
+        qs.push(n + &#x27;=&#x27; + v);
       }
     }
-    return qs.join('&amp;');
+    return qs.join(&#x27;&amp;&#x27;);
   };
   /**
    * apis for fast access over data
@@ -715,7 +756,7 @@ app = function (name, cnf) {
     if (!nodePosition) {
       return this.data[elName];
     }
-    if (typeof this.data[elName].element == 'object' &amp;&amp;
+    if (typeof this.data[elName].element == &#x27;object&#x27; &amp;&amp;
       this.data[elName].element[nodePosition]) {
       return this.data[elName].element[nodePosition];
     }
@@ -729,10 +770,10 @@ var z = {};
  * create / retrieve a single app
  *
  * e.g.
- * ```
- * var app = SimpleApp('my-app');
- * app.init(document.getElementById('app_container'), true);
- * ```
+ * &#x60;&#x60;&#x60;
+ * var app = SimpleApp(&#x27;my-app&#x27;);
+ * app.init(document.getElementById(&#x27;app_container&#x27;), true);
+ * &#x60;&#x60;&#x60;
  * @param {string} name
  * @param {object} [config={}] | note: this is the system config
  * @returns {SimpleApp}
@@ -742,24 +783,24 @@ w.SimpleApp = function (name, config) {
   return z[name];
 };
 // nodejs compatible
-if (typeof exports != 'undefined') {
+if (typeof exports != &#x27;undefined&#x27;) {
   exports.SimpleApp = w.SimpleApp;
-}</code></pre>
-        </article>
-    </section>
-
-
-
-
+}
+    </pre>
 </div>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Feb 29 2016 21:21:27 GMT+1100 (AEDT) using the Minami theme.
-</footer>
-
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
 <script>prettyPrint();</script>
-<script src="scripts/linenumber.js"></script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
 </body>
 </html>

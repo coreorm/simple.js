@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>app.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="app.html">
+                  app.js
+                </a>
+              
+                
+                <a class="source" href="vNode.html">
+                  vNode.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>app.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/*jslint browser: true*/</span>
+<span class="hljs-comment">/*jslint node: true */</span>
+<span class="hljs-meta">'use strict'</span>;
+<span class="hljs-keyword">var</span> w = <span class="hljs-built_in">window</span>;
+<span class="hljs-comment">/**
+ * current mini seconds
+ * @returns {number}
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">ms</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Date</span>.now();
+};
+<span class="hljs-comment">/**
+ * is object empty?
+ * @param {object} obj
+ * @returns {boolean}
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">oie</span>(<span class="hljs-params">obj</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(obj).length === <span class="hljs-number">0</span>;
+};
+
+<span class="hljs-comment">/**
+ * document.getElementById
+ * @param {string} id
+ * @returns {*}
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">d2e</span>(<span class="hljs-params">id</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">document</span>.getElementById(id);
+}
+
+<span class="hljs-comment">/**
+ * Events available
+ */</span>
+w.SimpleAppStart = <span class="hljs-string">'sta'</span>;
+w.SimpleAppFinish = <span class="hljs-string">'fin'</span>;
+w.SimpleAppWillRender = <span class="hljs-string">'wrd'</span>;
+w.SimpleAppDidRender = <span class="hljs-string">'drd'</span>;
+w.SimpleAppRenderElement = <span class="hljs-string">'rde'</span>;
+w.SimpleAppParseElementData = <span class="hljs-string">'ped'</span>;
+w.SimpleAppStateIsUpdated = <span class="hljs-string">'siu'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>lib</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">String</span>.prototype.hashCode = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">var</span> hash = <span class="hljs-number">0</span>, i, chr, len;
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.length === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> hash;
+  <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>, len = <span class="hljs-keyword">this</span>.length; i &lt; len; i++) {
+    chr = <span class="hljs-keyword">this</span>.charCodeAt(i);
+    hash = ((hash &lt;&lt; <span class="hljs-number">5</span>) - hash) + chr;
+    hash |= <span class="hljs-number">0</span>;
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Math</span>.abs(hash);
+};
+<span class="hljs-comment">/**
+ * string converter
+ * @param {object} obj
+ * @private
+ */</span>
+<span class="hljs-keyword">var</span> _s = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">obj</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">JSON</span>.stringify(obj);
+};
+<span class="hljs-comment">/**
+ * obj copier
+ * @param {object} obj
+ * @private
+ */</span>
+<span class="hljs-keyword">var</span> _c = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">obj</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">JSON</span>.parse(_s(obj));
+};
+<span class="hljs-comment">/**
+ * app base class
+ * @param {string} name
+ * @param {object} [cnf={}]
+ */</span>
+<span class="hljs-keyword">var</span> app;
+app = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">name, cnf</span>) </span>{
+  <span class="hljs-keyword">this</span>.aName = name;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>defaults</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  name = _s(name).hashCode();
+  <span class="hljs-keyword">var</span> prefix = <span class="hljs-string">'_sj_'</span> + name;
+  <span class="hljs-keyword">this</span>.name = name;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>register app</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  w[prefix] = <span class="hljs-keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>local storage key</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">this</span>.localStorageKey = prefix + <span class="hljs-string">'_data'</span>;
+  <span class="hljs-keyword">this</span>.container = <span class="hljs-literal">null</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>state of the app</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">this</span>.state = {};
+  <span class="hljs-keyword">this</span>.pState = {};
+  <span class="hljs-comment">/**
+   * config default
+   * no data, no render
+   */</span>
+  <span class="hljs-keyword">this</span>.cnf = {
+    localStorageWrite: <span class="hljs-literal">true</span>,
+    localStorageRead: <span class="hljs-literal">true</span>,
+    partialRender: <span class="hljs-literal">true</span>
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>override with external cnf</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> cnf == <span class="hljs-string">'object'</span>) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> k <span class="hljs-keyword">in</span> cnf) {
+      <span class="hljs-keyword">this</span>.cnf[k] = cnf[k];
+    }
+  }
+
+  <span class="hljs-comment">/**
+   * callback registry
+   * @type {{els: {}}}
+   */</span>
+  <span class="hljs-keyword">this</span>.callbacks = {
+    sta: {},
+    fin: {},
+    wrd: {},
+    drd: {},
+    rde: {},
+    ped: {},
+    siu: {}
+  };
+
+  <span class="hljs-comment">/**
+   * get call by name and type
+   * @param {string} type
+   * @param {string} [name=null]
+   * @returns {*}
+   */</span>
+  <span class="hljs-keyword">this</span>.getCallback = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">type, name</span>) </span>{
+    <span class="hljs-keyword">if</span> (name) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-keyword">this</span>.callbacks[type][name] == <span class="hljs-string">'function'</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.callbacks[type][name];
+      }
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.callbacks[type];
+    }
+  };
+
+  <span class="hljs-comment">/**
+   * event triggers
+   * @param {string} type
+   * @param {string} name
+   * @param {function} callback
+   */</span>
+  <span class="hljs-keyword">this</span>.on = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">type, name, callback</span>) </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-keyword">this</span>.callbacks[type] == <span class="hljs-string">'object'</span>) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> callback == <span class="hljs-string">'function'</span>) {
+        <span class="hljs-keyword">this</span>.callbacks[type][name] = callback;
+      }
+    }
+  };
+  <span class="hljs-comment">/**
+   * fire events
+   * @param {string} type
+   * @private
+   */</span>
+  <span class="hljs-keyword">this</span>._f = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">type</span>) </span>{
+    <span class="hljs-keyword">var</span> calls = <span class="hljs-keyword">this</span>.getCallback(type);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> calls == <span class="hljs-string">'object'</span>) {
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> k <span class="hljs-keyword">in</span> calls) {
+        <span class="hljs-keyword">var</span> call = calls[k];
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> call == <span class="hljs-string">'function'</span>) {
+          <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'&gt;&gt; calls - '</span> + k, calls);
+          call();
+        }
+      }
+    }
+  };
+  <span class="hljs-comment">/**
+   * update state of an element
+   * @param {*} elementOrName, if value presents and this param is string, this will be a direct update
+   * @param {*} [valueOrNull=Null] optional, if the first param is element with value, it will use that
+   */</span>
+  <span class="hljs-keyword">this</span>.updateState = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">elementOrName, valueOrNull</span>) </span>{
+    <span class="hljs-keyword">var</span> name, value, el;
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> elementOrName == <span class="hljs-string">'string'</span>) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'=&gt; update state by name/value'</span>, elementOrName, valueOrNull);
+      name = elementOrName;
+      value = valueOrNull;
+      <span class="hljs-keyword">this</span>.state[elementOrName] = valueOrNull;
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> elementOrName == <span class="hljs-string">'object'</span> &amp;&amp; <span class="hljs-keyword">typeof</span> elementOrName.nodeName == <span class="hljs-string">'string'</span>) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'=&gt; update state by element'</span>, elementOrName);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>must be object</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      el = elementOrName;
+      <span class="hljs-keyword">var</span> nodeName = el.nodeName;
+      <span class="hljs-keyword">var</span> type = el.type;
+      <span class="hljs-keyword">if</span> (nodeName == <span class="hljs-string">'SELECT'</span>) {
+        type = <span class="hljs-string">'select'</span>;
+      }
+      name = el.name;
+      value = el.value;
+      <span class="hljs-keyword">switch</span> (type) {
+        <span class="hljs-keyword">case</span> <span class="hljs-string">'select'</span>:
+        <span class="hljs-keyword">case</span> <span class="hljs-string">'text'</span>:
+        <span class="hljs-keyword">case</span> <span class="hljs-string">'radio'</span>:
+          <span class="hljs-keyword">this</span>.state[name] = value;
+          <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-string">'checkbox'</span>:
+          <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.state[name]) {
+            <span class="hljs-keyword">this</span>.state[name] = [];
+          }
+          <span class="hljs-keyword">if</span> (el.checked &amp;&amp; value.length &gt; <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.state[name].indexOf(value) &lt; <span class="hljs-number">0</span>) {
+              <span class="hljs-keyword">this</span>.state[name].push(value);
+            }
+          } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">var</span> pos = <span class="hljs-keyword">this</span>.state[name].indexOf(value);
+            <span class="hljs-keyword">if</span> (pos &gt;= <span class="hljs-number">0</span>) {
+              <span class="hljs-keyword">this</span>.state[name].splice(pos, <span class="hljs-number">1</span>);
+            }
+          }
+          <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">default</span>:
+          <span class="hljs-keyword">this</span>.state[name] = value;
+          <span class="hljs-keyword">break</span>;
+      }
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>save local if necessary</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.store();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>notify callback</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.stateIsUpdated({
+      name: name,
+      value: value,
+      element: el,
+      state: <span class="hljs-keyword">this</span>.state
+    });
+  };
+  <span class="hljs-comment">/**
+   * add cr to fire this for your own elements
+   * or even directly over-write this function
+   * @param {object} data
+   */</span>
+  <span class="hljs-keyword">this</span>.stateIsUpdated = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>callback by name</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> c = <span class="hljs-keyword">this</span>.getCallback(<span class="hljs-string">'siu'</span>, data.name);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> c == <span class="hljs-string">'function'</span>) <span class="hljs-keyword">return</span> c(data);
+    <span class="hljs-keyword">return</span> data;
+  };
+  <span class="hljs-comment">/**
+   * template engine
+   * @param {string} template
+   * @param {object} data
+   * @param {boolean} [doNotSkip=true] if true, do not skip the undefined tags
+   * @returns {*}
+   */</span>
+  <span class="hljs-keyword">this</span>.htpl = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">template, data, doNotSkip</span>) </span>{
+    doNotSkip = (doNotSkip === <span class="hljs-literal">true</span>);
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">var</span> output = template;
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> n <span class="hljs-keyword">in</span> data) {
+        <span class="hljs-keyword">if</span> (n.length &gt; <span class="hljs-number">0</span>) {
+          <span class="hljs-keyword">var</span> search = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">'{'</span> + n + <span class="hljs-string">'}'</span>, <span class="hljs-string">'g'</span>), rep = data[n];
+          output = output.replace(search, rep);
+        }
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>clean final output</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (doNotSkip !== <span class="hljs-literal">true</span>) output = output.replace(<span class="hljs-regexp">/{[^&lt;&gt;}]+}/ig</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/{&gt;([^}]+)}/ig</span>, <span class="hljs-string">'{$1}'</span>);
+      <span class="hljs-keyword">return</span> output;
+    } <span class="hljs-keyword">catch</span> (e) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[Error] html template failure'</span>, e);
+      <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+    }
+  };
+  <span class="hljs-comment">/**
+   * store state in local storage
+   */</span>
+  <span class="hljs-keyword">this</span>.store = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.cnf.localStorageWrite &amp;&amp; <span class="hljs-keyword">typeof</span> w.localStorage == <span class="hljs-string">'object'</span>) {
+      w.localStorage.setItem(<span class="hljs-keyword">this</span>.localStorageKey, _s(<span class="hljs-keyword">this</span>.state));
+    }
+  };
+  <span class="hljs-comment">/**
+   * retrieve state from local storage
+   */</span>
+  <span class="hljs-keyword">this</span>.load = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.cnf.localStorageRead &amp;&amp; <span class="hljs-keyword">typeof</span> w.localStorage == <span class="hljs-string">'object'</span>) {
+      <span class="hljs-keyword">var</span> d = w.localStorage.getItem(<span class="hljs-keyword">this</span>.localStorageKey);
+      <span class="hljs-keyword">if</span> (!d) <span class="hljs-keyword">return</span>;
+      <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-built_in">JSON</span>.parse(d);
+      } <span class="hljs-keyword">catch</span> (e) {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[ERROR] Unable to parse state '</span> + d, e);
+      }
+    }
+  };
+  <span class="hljs-comment">/*------ elements cnf ------*/</span>
+  <span class="hljs-comment">/**
+   * template: must have default template, or render will return empty string
+   * if 'selected' template is available, when data fits in the current state, it will use selected state
+   * within template, use
+   * {__s} for save state calls, e.g. {__s}('foo', 'bar') or {__s}s(this) for elements
+   * @type {{main: {}, sub: {}}}
+   */</span>
+  <span class="hljs-keyword">this</span>.template = {main: {}, sub: {}};
+  <span class="hljs-comment">/**
+   * data for elements
+   * @type {{main: {}, sub: {}}}
+   */</span>
+  <span class="hljs-keyword">this</span>.data = {};
+  <span class="hljs-comment">/**
+   * previous data
+   * @type {{main: {}, sub: {}}}
+   */</span>
+  <span class="hljs-keyword">this</span>.pData = {};
+  <span class="hljs-comment">/**
+   * callback: get element style
+   * @param {string} elName
+   * @param {object} state
+   * @param {object} data
+   *
+   * @returns {*}
+   */</span>
+  <span class="hljs-keyword">this</span>.els = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">elName, state, data</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>is there style in template setting already?</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (data._style) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'&gt;&gt;&gt; Style for '</span> + elName + <span class="hljs-string">': '</span> + data._style);
+      <span class="hljs-keyword">return</span> data._style;
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>otherwise, default</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (state) {
+      <span class="hljs-keyword">var</span> s = _s(state);
+      <span class="hljs-keyword">var</span> v = _s(data.value);
+      <span class="hljs-keyword">return</span> (s.indexOf(v) &gt;= <span class="hljs-number">0</span>) ? <span class="hljs-string">'selected'</span> : <span class="hljs-string">'default'</span>;
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'default'</span>;
+  };
+  <span class="hljs-comment">/**
+   * generate element id
+   * @param {string} elName
+   * @returns {string}
+   */</span>
+  <span class="hljs-keyword">this</span>.eId = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">elName</span>) </span>{
+    <span class="hljs-keyword">return</span> prefix + <span class="hljs-string">'_el_'</span> + elName;
+  };
+  <span class="hljs-comment">/**
+   * callback: custom data parser
+   * @param {string} elName
+   * @param {object} state
+   * @param {object} data
+   * @param {string} type
+   * @param {int} [subNodeCnt=0] if &gt; 0, it's a sub node
+   * @returns {{}}
+   */</span>
+  <span class="hljs-keyword">this</span>.parseElementData = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">elName, state, data, type, subNodeCnt</span>) </span>{
+    <span class="hljs-keyword">if</span> (!data) data = {};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>check if callback is registered</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> c = <span class="hljs-keyword">this</span>.getCallback(<span class="hljs-string">'ped'</span>, elName);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> c == <span class="hljs-string">'function'</span>) <span class="hljs-keyword">return</span> c(state, data);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>prepare with attributes, allowed list (+ wildcar ‘data-<em>‘, ‘on</em>‘):</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> d = {}, a = [];
+    data.name = elName;
+
+    <span class="hljs-keyword">if</span> (subNodeCnt &gt; <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">if</span> (type != <span class="hljs-string">'select'</span>) {
+        <span class="hljs-keyword">if</span> (!data.id) data.id = <span class="hljs-keyword">this</span>.eId(elName + <span class="hljs-string">'_'</span> + subNodeCnt);
+      }
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">if</span> (!data.id) data.id = <span class="hljs-keyword">this</span>.eId(elName);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>generate on[change] by type</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> act = prefix + <span class="hljs-string">'.updateState(this)'</span>;
+    <span class="hljs-keyword">if</span> (!subNodeCnt) {
+      <span class="hljs-keyword">switch</span> (type) {
+        <span class="hljs-keyword">case</span> <span class="hljs-string">'select'</span>:
+          data.onchange = act;
+          <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-string">'input'</span>:
+          data.onkeyup = act;
+          <span class="hljs-keyword">if</span> (!data.value) {
+            data.value = state;
+          }
+          <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">default</span>:
+          <span class="hljs-keyword">if</span> (type) data.onclick = act;
+          <span class="hljs-keyword">break</span>;
+      }
+    }
+    d.selectState = <span class="hljs-string">''</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>select</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (subNodeCnt &gt; <span class="hljs-number">0</span> &amp;&amp; _s(state).indexOf(_s(data.value)) &gt;= <span class="hljs-number">0</span>) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'check select: '</span> + state + <span class="hljs-string">' &lt;&gt; '</span> + data.value);
+      <span class="hljs-keyword">if</span> (type == <span class="hljs-string">'select'</span>) {
+        data.selected = <span class="hljs-string">'selected'</span>;
+        d.selectState = <span class="hljs-string">'selected="selected"'</span>;
+      }
+      <span class="hljs-keyword">if</span> (type == <span class="hljs-string">'checkbox'</span> || type == <span class="hljs-string">'radio'</span>) {
+        data.checked = <span class="hljs-string">'checked'</span>;
+        d.selectState = <span class="hljs-string">'checked="checked"'</span>;
+      }
+    }
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i <span class="hljs-keyword">in</span> data) {
+      d[i] = data[i];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>rule: all custom variables must start with _, others will be treated as attributes</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (i.indexOf(<span class="hljs-string">'_'</span>) &lt; <span class="hljs-number">0</span>) {
+        a.push(i + <span class="hljs-string">'="'</span> + data[i] + <span class="hljs-string">'"'</span>);
+      }
+    }
+    d.attr = a.join(<span class="hljs-string">' '</span>);
+    d.action = act;
+    <span class="hljs-keyword">if</span> (elName == <span class="hljs-string">'welcomeStyle'</span>) <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'&gt;&gt;&gt; parseElementData'</span>, d);
+    <span class="hljs-keyword">return</span> d;
+  };
+  <span class="hljs-comment">/**
+   * get node by elementName
+   * @param {string} elName
+   * @returns {Element}
+   */</span>
+  <span class="hljs-keyword">this</span>.node = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">elName</span>) </span>{
+    <span class="hljs-keyword">return</span> d2e(<span class="hljs-keyword">this</span>.eId(elName));
+  };
+  <span class="hljs-comment">/*------ render ------*/</span>
+  <span class="hljs-comment">/**
+   * main template style
+   * @type {string}
+   */</span>
+  <span class="hljs-keyword">this</span>.style = <span class="hljs-string">'default'</span>;
+  <span class="hljs-comment">/**
+   * render entire app
+   * @param {boolean} [full=false] if true, force a complete render
+   *
+   * RUN LOGIC:
+   * 1. data changed for el?
+   *  1.1 is it a wrapper type?
+   *    YES: go to 1.2
+   *    NO:
+   *      1.1.0 is the vNode non-existent?
+   *        YES: new vNode()
+   *        NO: is the template style changed?
+   *          YES: new vNode
+   *          NO: go to next
+   *      1.1.1 is the data empty?
+   *        YES: vNode.remove()
+   *        NO: vNode.updateHTML()
+   *  1.2 yes it's a wrapper
+   *    1.2.0 is vNode non-existent?
+   *      YES: new vNode plus children
+   *      NO: go to next
+   *    1.2.1 loop thru children:
+   *      with each child:
+   *      new data count &gt; old data count?
+   *      YES:
+   *        vNode exists?
+   *          YES: vNode.updateHTML() - no need to remove anything (so order doesn't really matter)
+   *          NO: new vNode, vNode.right(parent);
+   *     NO:
+   *        count vNode and remove ones that are not in vNode.remove()
+   */</span>
+  <span class="hljs-keyword">this</span>.render = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">full</span>) </span>{
+    <span class="hljs-keyword">var</span> stime = ms();
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'=&gt; Start Rendering '</span> + <span class="hljs-keyword">this</span>.aName);
+    <span class="hljs-keyword">this</span>._f(<span class="hljs-string">'wrd'</span>);
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.container) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Invalid container specified'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>findout main template details</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> t = <span class="hljs-keyword">this</span>.template.main[<span class="hljs-keyword">this</span>.style];
+    <span class="hljs-keyword">var</span> d = {};
+    <span class="hljs-keyword">if</span> (!t) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Invalid master template for style: '</span> + <span class="hljs-keyword">this</span>.style);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>logic: force render clears prevData, and that, is that.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (full === <span class="hljs-literal">true</span>) <span class="hljs-keyword">this</span>.pData = {};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>verify data presence</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (oie(<span class="hljs-keyword">this</span>.data) || _s(<span class="hljs-keyword">this</span>.pData) == _s(<span class="hljs-keyword">this</span>.data)) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>nothing to render - data is empty, or data is unchanged</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'No data found, nothing will be rendered'</span>);
+      <span class="hljs-keyword">return</span>;
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>set control: force render</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> forceRender = oie(<span class="hljs-keyword">this</span>.pData);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>start loop and render (and pass forceRender if necessary)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> n <span class="hljs-keyword">in</span> <span class="hljs-keyword">this</span>.template.sub) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'=&gt; Render sub: '</span> + n);
+      <span class="hljs-keyword">var</span> tmp = <span class="hljs-keyword">this</span>.renderElement(n, forceRender);
+      <span class="hljs-keyword">if</span> (tmp) d[n] = tmp;
+    }
+    <span class="hljs-keyword">if</span> (forceRender || !oie(d)) {
+      <span class="hljs-keyword">this</span>.container.innerHTML = <span class="hljs-keyword">this</span>.htpl(t, d);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>at the end, run callback and set state/data
+make previous state the same as current now</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.pState = _c(<span class="hljs-keyword">this</span>.state);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>also make previous data the same as current data in elements</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.pData = _c(<span class="hljs-keyword">this</span>.data);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>callback</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>._f(<span class="hljs-string">'drd'</span>);
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'=&gt; Finish Rendering in '</span> + (ms() - stime) + <span class="hljs-string">' ms'</span>);
+  };
+  <span class="hljs-comment">/**
+   * render single element
+   * @param {string} elName
+   * @param {boolean} forceRender if true, for render without using node
+   * @returns {*}
+   */</span>
+  <span class="hljs-keyword">this</span>.renderElement = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">elName, forceRender</span>) </span>{
+    forceRender = (forceRender === <span class="hljs-literal">true</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>figure out the type (from template._type)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> data = <span class="hljs-keyword">this</span>.data[elName] || {}, state = <span class="hljs-keyword">this</span>.state[elName] || <span class="hljs-string">''</span>, output = <span class="hljs-string">''</span>;
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-keyword">this</span>.template.sub[elName] != <span class="hljs-string">'object'</span> || oie(data)) {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[Warning] No element template found or empty data for '</span> + elName);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>decide whether to remove it from parent…</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.cnf.partialRender &amp;&amp; !forceRender) {
+        <span class="hljs-keyword">var</span> existingNode = <span class="hljs-keyword">this</span>.node(elName);
+        <span class="hljs-keyword">if</span> (existingNode) {
+          <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'No data found, remove node'</span>);
+          existingNode.parentNode.removeChild(existingNode);
+          <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+        }
+      }
+
+      <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>if custom render function exists, use it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> c = <span class="hljs-keyword">this</span>.getCallback(<span class="hljs-string">'rde'</span>, elName);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> c == <span class="hljs-string">'function'</span>) <span class="hljs-keyword">return</span> c(state, data);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>is data changed? if not, do not render (when partial)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (_s(<span class="hljs-keyword">this</span>.data[elName]) == _s(<span class="hljs-keyword">this</span>.pData[elName])) {
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>does it have a wrapper? if not, render as a single element</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> t = <span class="hljs-keyword">this</span>.template.sub[elName], type = t._type;
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">if</span> (t._wrapper) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>logic: same or less -&gt; vNode.updateHTML || vNode.remove(), more? vNode.right();</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (!data.wrapper) data.wrapper = {};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>render as wrapper</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> wAttr = <span class="hljs-keyword">this</span>.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = <span class="hljs-number">0</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>check prevData to ensure rendering take advantage of vNode or innerHTML</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> tmpData = <span class="hljs-keyword">this</span>.pData[elName];
+      <span class="hljs-keyword">var</span> prevElementData = [];
+      <span class="hljs-keyword">if</span> (!tmpData) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>render all</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        forceRender = <span class="hljs-literal">true</span>;
+      } <span class="hljs-keyword">else</span> {
+        prevElementData = _c(tmpData.element);
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>loop and remove</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> nodeParent = <span class="hljs-literal">false</span>;
+      elData.map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">item</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>start rendering</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        m++;
+        <span class="hljs-keyword">var</span> di = _c(item);
+        <span class="hljs-keyword">var</span> si = self.els(elName, state, di);
+        <span class="hljs-keyword">var</span> ti = self.template.sub[elName][si];
+        <span class="hljs-keyword">var</span> datai = self.parseElementData(elName, state, di, t._type, m);
+        <span class="hljs-keyword">if</span> (!ti) ti = self.template.sub[elName][<span class="hljs-string">'default'</span>];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>is it select type?</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (t._type == <span class="hljs-string">'select'</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>just render and go</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          output += self.htpl(ti, datai);
+          <span class="hljs-keyword">return</span>;
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>retreive node
+1st. if not partial, or force render, keep adding to it</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (self.cnf.partialRender &amp;&amp; !forceRender) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>logic - data less or more?</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> n = m - <span class="hljs-number">1</span>, before = self.pData[elName].element[n], after = self.data[elName].element[n], src = <span class="hljs-literal">null</span>;
+          <span class="hljs-keyword">if</span> (_s(before) == _s(after)) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p>nothing is changed, do not render</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span>;
+          }
+          <span class="hljs-keyword">var</span> node = self.node(elName + <span class="hljs-string">'_'</span> + m);
+          <span class="hljs-keyword">if</span> (!nodeParent) nodeParent = node.parentNode;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>partial render here</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          src = self.htpl(ti, datai);
+          <span class="hljs-keyword">var</span> vn;
+          <span class="hljs-keyword">if</span> (nodeParent) {
+            <span class="hljs-keyword">if</span> (node) {
+              <span class="hljs-keyword">if</span> (src) {
+                vn = <span class="hljs-keyword">new</span> vNode(src, nodeParent);
+                vn.replace(node);
+              }
+            } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>add some more to it</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">if</span> (nodeParent) {
+                vn = <span class="hljs-keyword">new</span> vNode(src, nodeParent);
+                vn.right();
+              } <span class="hljs-keyword">else</span> {
+                <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[ERROR] unable to find node parent, can not append'</span>);
+              }
+            }
+          }
+
+        } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p>render as a whole (select, or force render, or initial render)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          output += self.htpl(ti, datai);
+        }
+      });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>removal when 1. nodeParent, 2. elPData exists</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (nodeParent &amp;&amp; prevElementData.length &gt; elData.length) {
+        prevElementData.map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, item</span>) </span>{
+            <span class="hljs-keyword">if</span> (item &gt;= m) {
+              <span class="hljs-keyword">var</span> node = self.node(elName + <span class="hljs-string">'_'</span> + item);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p>remove childnode</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>              <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Remove child: '</span> + item);
+              <span class="hljs-keyword">if</span> (node) nodeParent.removeChild(node);
+            }
+          }
+        );
+      }
+
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> output == <span class="hljs-string">'string'</span> &amp;&amp; output.length &gt; <span class="hljs-number">1</span>) {
+        output = self.htpl(t._wrapper[<span class="hljs-number">0</span>], wAttr) + output + t._wrapper[<span class="hljs-number">1</span>];
+      } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>stop here as it’s replaced</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'=&gt; Render Element ['</span> + elName + <span class="hljs-string">']: using DOM.'</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+      }
+    } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>single tag element - it should never be empty really - but lets work on it</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'&gt;&gt;&gt; render ['</span> + elName + <span class="hljs-string">'] as a whole'</span>);
+      <span class="hljs-keyword">var</span> si = <span class="hljs-keyword">this</span>.els(elName, state, data);
+      <span class="hljs-keyword">var</span> ti = <span class="hljs-keyword">this</span>.template.sub[elName][si];
+      <span class="hljs-keyword">var</span> datai = <span class="hljs-keyword">this</span>.parseElementData(elName, state, data, t._type);
+      <span class="hljs-keyword">if</span> (!ti) ti = <span class="hljs-keyword">this</span>.template.sub[elName][<span class="hljs-string">'default'</span>];
+      output = <span class="hljs-keyword">this</span>.htpl(ti, datai);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
+              <p>logic: if node exists, replace html, otherwise, return it
+verify if we have sibling enabled - so we can append it</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template.sub[elName]._sibling) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-53">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-53">&#182;</a>
+              </div>
+              <p>append sibling</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> sibling = <span class="hljs-keyword">this</span>.node(<span class="hljs-keyword">this</span>.template.sub[elName]._sibling);
+      <span class="hljs-keyword">if</span> (sibling) {
+        <span class="hljs-keyword">var</span> newNode = <span class="hljs-keyword">new</span> vNode(output, sibling.parentNode);
+        newNode.right();
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+      }
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>2nd - it must be partial and if node doesn’t exists, return itself, otherwise, update by replacing node</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (!forceRender &amp;&amp; <span class="hljs-keyword">this</span>.cnf.partialRender === <span class="hljs-literal">true</span> &amp;&amp; output) {
+      <span class="hljs-keyword">var</span> node = <span class="hljs-keyword">this</span>.node(elName), nn = <span class="hljs-literal">null</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>replace</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (node) {
+        nn = <span class="hljs-keyword">new</span> vNode(output);
+        nn.replace(node);
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+      }
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-56">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>finally, default</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> output;
+  };
+  <span class="hljs-comment">/*------ init ------*/</span>
+  <span class="hljs-comment">/**
+   * init app
+   * @param {string} container
+   * @param {boolean} [autoRender=true]
+   */</span>
+  <span class="hljs-keyword">this</span>.init = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">container, autoRender</span>) </span>{
+    <span class="hljs-keyword">if</span> (container) <span class="hljs-keyword">this</span>.container = container;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <p>load state from local storage if applicable</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.load();
+    <span class="hljs-keyword">if</span> (autoRender === <span class="hljs-literal">false</span>) <span class="hljs-keyword">return</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              <p>next, render</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>._f(<span class="hljs-string">'sta'</span>);
+    <span class="hljs-keyword">this</span>.render();
+    <span class="hljs-keyword">this</span>._f(<span class="hljs-string">'fin'</span>);
+  };
+
+  <span class="hljs-comment">/**
+   * export to query string
+   * @returns {string}
+   */</span>
+  <span class="hljs-keyword">this</span>.toQuerystring = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> qs = [];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> n <span class="hljs-keyword">in</span> <span class="hljs-keyword">this</span>.state) {
+      <span class="hljs-keyword">var</span> v = <span class="hljs-keyword">this</span>.state[n];
+      <span class="hljs-keyword">if</span> (v) {
+        qs.push(n + <span class="hljs-string">'='</span> + v);
+      }
+    }
+    <span class="hljs-keyword">return</span> qs.join(<span class="hljs-string">'&amp;'</span>);
+  };
+  <span class="hljs-comment">/**
+   * apis for fast access over data
+   * @param {string} elName
+   * @param {int} [nodePosition=Null]
+   * @returns {*}
+   */</span>
+  <span class="hljs-keyword">this</span>.d = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">elName, nodePosition</span>) </span>{
+    <span class="hljs-keyword">if</span> (!nodePosition) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data[elName];
+    }
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-keyword">this</span>.data[elName].element == <span class="hljs-string">'object'</span> &amp;&amp;
+      <span class="hljs-keyword">this</span>.data[elName].element[nodePosition]) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data[elName].element[nodePosition];
+    }
+  };
+};
+<span class="hljs-comment">/*------ export ------*/</span>
+<span class="hljs-keyword">var</span> z = {};
+<span class="hljs-comment">/**
+ * THIS IS THE MAIN ENTRY POINT
+ *
+ * create / retrieve a single app
+ *
+ * e.g.
+ * ```
+ * var app = SimpleApp('my-app');
+ * app.init(document.getElementById('app_container'), true);
+ * ```
+ * @param {string} name
+ * @param {object} [config={}] | note: this is the system config
+ * @returns {SimpleApp}
+ */</span>
+w.SimpleApp = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">name, config</span>) </span>{
+  <span class="hljs-keyword">if</span> (!z[name]) z[name] = <span class="hljs-keyword">new</span> app(name, config);
+  <span class="hljs-keyword">return</span> z[name];
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <p>nodejs compatible</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> exports != <span class="hljs-string">'undefined'</span>) {
+  exports.SimpleApp = w.SimpleApp;
+}</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
