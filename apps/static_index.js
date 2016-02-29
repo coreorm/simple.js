@@ -9,6 +9,7 @@
     hdr: {
       title: 'Welcome to Simple.JS',
       _link: src('apps/static_index.js'),
+      _ver: app.version,
       _content: 'A simple, data-driven web application library and templating system. Natively implemented and offer great compatibility.'
     },
     welcome: {
@@ -44,7 +45,7 @@
 
   app.template.sub = {
     hdr: {
-      default: '<div {attr}><h1 class="page-header">{title}</h1> {_content} {_link} </div>'
+      default: '<div {attr}><h1 class="page-header">{title} <span class="badge">{_ver}</span></h1> {_content} {_link} </div>'
     },
     welcome: {
       default: '<div {attr}><div class="panel-heading"><strong>{title}</strong></div><div class="panel-body">{_content}</div></div>',
