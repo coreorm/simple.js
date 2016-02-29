@@ -7,17 +7,17 @@ var w = window;
  * current mini seconds
  * @returns {number}
  */
-var ms = function () {
+function ms() {
   return Date.now();
-};
+}
 /**
  * is object empty?
  * @param {object} obj
  * @returns {boolean}
  */
-var oie = function (obj) {
+function oie(obj) {
   return Object.keys(obj).length === 0;
-};
+}
 
 /**
  * virtual node
@@ -154,17 +154,17 @@ String.prototype.hashCode = function () {
  * @param {object} obj
  * @private
  */
-var _s = function (obj) {
+function _s(obj) {
   return JSON.stringify(obj);
-};
+}
 /**
  * obj copier
  * @param {object} obj
  * @private
  */
-var _c = function (obj) {
+function _c(obj) {
   return JSON.parse(_s(obj));
-};
+}
 /**
  * app base class
  * @param {string} name
@@ -172,6 +172,8 @@ var _c = function (obj) {
  */
 var app;
 app = function (name, cnf) {
+  // current version from build
+  this.version = '1.0.3';
   this.aName = name;
   // defaults
   name = _s(name).hashCode();
@@ -805,5 +807,6 @@ w.SimpleApp = function (name, config) {
 if (typeof exports != 'undefined') {
   exports.SimpleApp = w.SimpleApp;
 }
+
 })
 (this);
