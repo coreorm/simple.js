@@ -651,12 +651,13 @@ app = function (name, cnf) {
         if (self.cnf.partialRender && !forceRender) {
           // logic - data less or more?
           var n = m - 1, before = self.pData[elName].element[n], after = self.data[elName].element[n], src = null;
+          // fix parent before comparing...
+          var node = self.node(elName + '_' + m);
+          if (!nodeParent) nodeParent = node.parentNode;
           if (_s(before) == _s(after)) {
             // nothing is changed, do not render
             return;
           }
-          var node = self.node(elName + '_' + m);
-          if (!nodeParent) nodeParent = node.parentNode;
           // partial render here
           src = self.htpl(ti, datai);
           var vn;
