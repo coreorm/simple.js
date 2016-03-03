@@ -52,6 +52,7 @@ and this is where you may choose to execute your own codes, or re-render the vie
 
 ## Build Guides
 - run `npm install` when you finish checking out the files
+- run `npm install replace -g` so replace will work on all platforms (sed has issues on different os x versions)
 - run `npm run` to see the available options, or just:
 - run `npm run watch` to watch the changes
 - run `npm run server` to start the web server so you may access a local `localhost:8080/dist/simple.dev.js`
