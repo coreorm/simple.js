@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Simple JS for Comprehensive Apps",
   "scripts": {
-    "test": "echo '=> Test' && mocha",
+    "test": "echo '=> Test' && mocha-phantomjs test/app.html",
     "info": "echo 'Simple JS for Apps, supports defer/async and uses native JS with no external libs'",
     "lint": "echo '=> JS Linkting' && jshint src/*.js",
     "pretest": "npm run lint -s",
