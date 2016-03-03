@@ -173,7 +173,7 @@ function _c(obj) {
 var app;
 app = function (name, cnf) {
   // current version from build
-  this.version = '1.0.3';
+  this.version = '1.0.4';
   this.aName = name;
   // defaults
   name = _s(name).hashCode();
