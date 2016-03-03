@@ -7,7 +7,7 @@
     "info": "echo 'Simple JS for Apps, supports defer/async and uses native JS with no external libs'",
     "lint": "echo '=> JS Linkting' && jshint src/*.js",
     "pretest": "npm run lint -s",
-    "build": "echo '=> Build All' && npm run build:dev && uglifyjs -c drop_console=true dist/simple.dev.js -o dist/simple.js && minify dist/simple.js && rm dist/simple.js && sed -i '' --  \"s/{version}/$(cat VERSION)/g\" dist/*",
+    "build": "echo '=> Build All' && npm run build:dev && uglifyjs -c drop_console=true dist/simple.dev.js -o dist/simple.js && minify dist/simple.js && rm dist/simple.js && sed -i \"s/{version}/$(cat VERSION)/g\" dist/*",
     "build:dev": "echo '=> Build Dev' && cat src/start.inc src/app.js src/end.inc > dist/simple.dev.js",
     "watch": "watch 'npm run build' src/",
     "server": "http-server ./",
@@ -22,6 +22,7 @@
   "repository": "https://coreorm@bitbucket.org/coreorm/simple.js.git",
   "license": "MIT",
   "devDependencies": {
+    "chai": "^3.5.0",
     "http-server": "^0.8.5",
     "jshint": "^2.9.1",
     "minami": "^1.1.1",
