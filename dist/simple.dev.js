@@ -746,13 +746,14 @@ var z = {};
  * @param {object} [config={}] | note: this is the system config
  * @returns {SimpleApp}
  */
-w.SimpleApp = function (name, config) {
+var SimpleApp = function (name, config) {
   if (!z[name]) z[name] = new app(name, config);
   return z[name];
 };
+w.SimpleApp = SimpleApp;
 // nodejs compatible
 if (typeof exports != 'undefined') {
-  exports.SimpleApp = w.SimpleApp;
+  exports.SimpleApp = SimpleApp;
 }
 
 })
