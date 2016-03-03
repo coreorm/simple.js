@@ -8,7 +8,7 @@ var w = window;
  */
 function ms() {
   return Date.now();
-};
+}
 /**
  * is object empty?
  * @param {object} obj
@@ -16,6 +16,51 @@ function ms() {
  */
 function oie(obj) {
   return Object.keys(obj).length === 0;
+}
+
+/**
+ * virtual node
+ * @param {string} src
+ * @param {object} parentNode
+ */
+var vNode = function (src, parentNode) {
+  this.src = src;
+  parentNode = parentNode || document.createElement('div');
+  this.parent = parentNode;
+  try {
+    var n = this.parent.cloneNode(false);
+    n.innerHTML = this.src;
+    this.node = n.firstChild;
+  } catch (e) {
+    console.log('ERROR:', e);
+    return;
+  }
+  /**
+   * insert to the right
+   * @param {object} [parent=null] parent node
+   */
+  this.right = function (parent) {
+    try {
+      if (parent) this.parent = parent;
+      this.parent.appendChild(this.node);
+    } catch (e) {
+      console.log('ERROR: vNode.right()', e);
+    }
+  };
+  /**
+   * replace given node with self
+   * @param {object} node
+   */
+  this.replace = function (node) {
+    var targ = node;
+    if (node instanceof vNode) targ = node.node;
+    try {
+      this.parent = node.parentNode;
+      this.parent.replaceChild(this.node, targ);
+    } catch (e) {
+      console.log('ERROR: vNode.replace()', e, node);
+    }
+  };
 };
 
 /**
@@ -54,17 +99,17 @@ String.prototype.hashCode = function () {
  * @param {object} obj
  * @private
  */
-var _s = function (obj) {
+function _s(obj) {
   return JSON.stringify(obj);
-};
+}
 /**
  * obj copier
  * @param {object} obj
  * @private
  */
-var _c = function (obj) {
+function _c(obj) {
   return JSON.parse(_s(obj));
-};
+}
 /**
  * app base class
  * @param {string} name
@@ -72,6 +117,8 @@ var _c = function (obj) {
  */
 var app;
 app = function (name, cnf) {
+  // current version from build
+  this.version = '{version}';
   this.aName = name;
   // defaults
   name = _s(name).hashCode();
@@ -550,12 +597,13 @@ app = function (name, cnf) {
         if (self.cnf.partialRender && !forceRender) {
           // logic - data less or more?
           var n = m - 1, before = self.pData[elName].element[n], after = self.data[elName].element[n], src = null;
+          // fix parent before comparing...
+          var node = self.node(elName + '_' + m);
+          if (!nodeParent) nodeParent = node.parentNode;
           if (_s(before) == _s(after)) {
             // nothing is changed, do not render
             return;
           }
-          var node = self.node(elName + '_' + m);
-          if (!nodeParent) nodeParent = node.parentNode;
           // partial render here
           src = self.htpl(ti, datai);
           var vn;
