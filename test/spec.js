@@ -142,3 +142,62 @@ describe('Render', function () {
   });
 
 });
+
+/* callbacks */
+describe('callback', function () {
+  // 1st. base app - an app with a form
+  before(function () {
+    // clear local storage
+    document.getElementById('main_app').innerHTML = '';
+  });
+
+  var app = SimpleApp('callback-test');
+  app.template = {
+    main: {
+      default: '<form>{textInput} {button}</form>'
+    },
+    sub: {
+      textInput: {
+        _type: 'input',
+        default: '<input {attr}>'
+      },
+      button: {
+        default: '<button {attr}>{_cap}</button>'
+      }
+    }
+  };
+  app.data = {
+    textInput: {
+      name: 'text',
+      type: 'text'
+    },
+    button: {
+      _cap: 'press me',
+      type: 'button'  // this stops the form submit
+    }
+  };
+
+  it('callback on input text change', function () {
+    // define callbacks
+    var v = 'hello';
+    app.init(document.getElementById('main_app'), true);
+    // callback on text change
+    app.on(SimpleAppStateIsUpdated, 'textInput', function (data) {
+      expect(data.value).to.equal(v);
+    });
+    // now trigger it
+    app.updateState('textInput', v);
+  });
+
+  it('callback on button state change', function () {
+    // define callbacks
+    // callback on text change
+    app.on(SimpleAppStateIsUpdated, 'button', function (data) {
+      expect(data.name).to.equal('button');
+    });
+    // now trigger it
+    app.updateState('button', null);
+  });
+
+
+});
