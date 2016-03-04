@@ -178,6 +178,18 @@ describe('callback', function () {
   };
 
   it('callback on input text change', function () {
+    var called = {
+      start: 0,
+      end: 0,
+      renderStart: 0,
+      renderEnd: 0
+    };
+    app.on(SimpleAppStart, '1', function () {
+      called.start += 1;
+    });
+    app.on(SimpleAppFinish, '1', function () {
+      called.end += 1;
+    });
     // define callbacks
     var v = 'hello';
     app.init(document.getElementById('main_app'), true);
@@ -187,6 +199,9 @@ describe('callback', function () {
     });
     // now trigger it
     app.updateState('textInput', v);
+    // and app start is 1
+    expect(called.start).to.equal(1);
+    expect(called.end).to.equal(1);
   });
 
   it('callback on button state change', function () {
