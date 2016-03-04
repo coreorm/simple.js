@@ -67,3 +67,13 @@ If prevData is empty, vNodes cache will be emptied and all vNodes will be re-loc
 
 ## data logic
 after a successful rendering process, the `prevData` attribute will be replaced by the current data so to prevent possible double rendering.
+
+
+## updated 2016-03-04
+
+- anti MVC pattern: no need to make it such a big thingy
+- example: http://todomvc.com/examples/emberjs/#/ but replace it with simple.js and show how small it is.
+
+## TODO:
+- type: form, onsubmit =...
+- dynamic targeting for things like todo-list, use current elName + position
