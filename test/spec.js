@@ -190,6 +190,12 @@ describe('callback', function () {
     app.on(SimpleAppFinish, '1', function () {
       called.end += 1;
     });
+    app.on(SimpleAppWillRender, '1', function () {
+      called.renderStart += 1;
+    });
+    app.on(SimpleAppDidRender, '1', function () {
+      called.renderEnd += 1;
+    });
     // define callbacks
     var v = 'hello';
     app.init(document.getElementById('main_app'), true);
@@ -202,6 +208,15 @@ describe('callback', function () {
     // and app start is 1
     expect(called.start).to.equal(1);
     expect(called.end).to.equal(1);
+    // call render twice
+    app.data.textInput.value = 'new value';
+    app.render();
+    expect(called.renderStart).to.equal(2);
+    expect(called.renderEnd).to.equal(2);
+    app.data.textInput.value = 'new value again';
+    app.render();
+    expect(called.renderStart).to.equal(3);
+    expect(called.renderEnd).to.equal(3);
   });
 
   it('callback on button state change', function () {
