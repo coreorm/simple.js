@@ -119,7 +119,7 @@ function _c(obj) {
 var app;
 app = function (name, cnf) {
   // current version from build
-  this.version = '1.0.5';
+  this.version = '1.1.0';
   this.aName = name;
   // defaults
   name = _s(name).hashCode();
@@ -528,7 +528,6 @@ app = function (name, cnf) {
       }
     }
     parsedData.attr = attrs.join(' ');
-    console.log(parsedData);
     return parsedData;
   };
   /**

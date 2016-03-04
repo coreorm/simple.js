@@ -527,7 +527,6 @@ app = function (name, cnf) {
       }
     }
     parsedData.attr = attrs.join(' ');
-    console.log(parsedData);
     return parsedData;
   };
   /**
