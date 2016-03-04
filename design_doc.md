@@ -77,3 +77,18 @@ after a successful rendering process, the `prevData` attribute will be replaced 
 ## TODO:
 - type: form, onsubmit =...
 - dynamic targeting for things like todo-list, use current elName + position
+
+### solution:
+- use dataList tags, e.g data-value, data-name, data-action, etc.
+- use attr-[section name] for multi attr replacements, logic:
+ * if no `{attr-` found in template, stop it.
+ * otherwise, find `{attr-(section name)`, and use section name to figure out the section related attrs and group them. e.g.
+  - `<div {attr-div}><label {attr-label}>{_lbl}</label><input {attr-input}></div>`
+  - and it requires data to be multi-layered:
+   - `div: {class:"blah blah", value: "blah blah"}`
+   - `label: {_lbl: "blah blah"}`
+   - etc.
+  - just test if the data is actually multi-layered, as other data should be single string only (for replacements)
+- on top of all these, enable data-name="elName" and data-index="1" to mark out each element, then
+- support data-action="delete" for action, etc.
+- then when update is firing, use `element.dataset` to access all datasets.

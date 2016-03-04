@@ -87,6 +87,7 @@
     var r = 'row' + data.state.row;
     var c = data.state.col;
     try {
+      console.log(app.d(r, c), r, c);
       if (typeof app.data[r].element[c] == 'object') {
         app.d(r, c).label = data.value;
         app.d(r, c).style = 'background:yellow';

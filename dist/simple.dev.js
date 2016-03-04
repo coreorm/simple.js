@@ -230,7 +230,7 @@ app = function (name, cnf) {
       if (nodeName == 'SELECT') {
         type = 'select';
       }
-      name = el.name;
+      name = el.dataset.name;
       value = el.value;
       switch (type) {
         case 'select':
@@ -377,72 +377,159 @@ app = function (name, cnf) {
   };
   /**
    * callback: custom data parser
+   * new logic:
+   * data will be 2 types:
+   * 1. single (1 level). e.g. {foo: 'bar'} - this requires no `{attr-[name]}` type tags in template
+   * 2. multi (2 levels). e.g. {element: {foo: 'bar'}, element2: {foo: 'bar2'}}, and this requires `{attr-[name]}` template
+   * 3. system reserved data keys (use these keys to define preferred action):
+   *  3.1 _e_: the event - use keyup, keydown, change, click, select, etc. default is click.
+   *  3.2 _n_: the element name - used for look up, this will endup in data-name
+   *  3.3. _i_: the index (for wrap element only), this will endup in data-index
+   *  and the above 2 are used for system node lookup only (for state update)
+   * 4. keys starts with '_' will be ignored in the template, but stateIsUpdated callback will pass it in.
+   * 5. all other keys will be used in attr (so you still may pass class, id, title, style, etc).
+   *
+   * Example:
+   * single type:
+   * ```
+   * app.template.sub.foo = '<input name="foo" {attr}>';
+   * app.data.foo = {
+   *  _e_: 'keyup' // custom action when no type is specified
+   * }
+   * ```
+   * wrapper type:
+   * ```
+   * app.template.sub.foo = {
+   *  _wrapper: ['<ul name="foo" {attr}>', '</ul>'],
+   *  default: '<li {attr}><input type="checkbox" {attr-check}><label>{_lbl}</label></li>'
+   * }
+   * app.data.foo = {
+   *  wrapper: {class: 'list'},
+   *  element: [
+   *  {
+   *    class: 'list-normal',
+   *    _lbl: 'first item',
+   *    check: {
+   *      _e_: 'click',
+   *      class: 'checkbox-normal'
+   *    }
+   *  },
+   *  {
+   *    class: 'list-normal',
+   *    _lbl: 'Second item',
+   *    check: {
+   *      _e_: 'click',
+   *      class: 'checkbox-special'
+   *    }
+   *  }
+   *  ]
+   * }
+   * ```
+   * So system will pickup the stuff automatically from template and data, and it will
+   * 1. first, generate unique id for the first item (so {attr} must still be there)
+   * 2. find the sub section and generate the {attr-section} for the subs
+   *
+   * The event: event will be figured out by given _type, otherwise _e_ will always override it
+   *
    * @param {string} elName
    * @param {object} state
    * @param {object} data
-   * @param {string} type
+   * @param {string} type (this is when there's only 1 sub type in there - if more, it will then use sub sections _e_)
    * @param {int} [subNodeCnt=0] if > 0, it's a sub node
    * @returns {{}}
    */
   this.parseElementData = function (elName, state, data, type, subNodeCnt) {
+    var attrs = [], parsedData = {};
     if (!data) data = {};
     // check if callback is registered
     var c = this.getCallback('ped', elName);
     if (typeof c == 'function') return c(state, data);
-    // prepare with attributes, allowed list (+ wildcar 'data-*', 'on*'):
-    var d = {}, a = [];
-    data.name = elName;
+    // build attr
+    attrs.push('data-name="' + elName + '"');
+    attrs.push('data-state="' + state + '"');
 
     if (subNodeCnt > 0) {
+      attrs.push('data-index="' + (subNodeCnt - 1) + '"');
       if (type != 'select') {
         if (!data.id) data.id = this.eId(elName + '_' + subNodeCnt);
       }
     } else {
       if (!data.id) data.id = this.eId(elName);
     }
+    // only one single id, ever
+    parsedData.id = data.id;
     // generate on[change] by type
-    var act = prefix + '.updateState(this)';
-    if (!subNodeCnt) {
+    var event = null;
+    if (type !== '') {
       switch (type) {
         case 'select':
-          data.onchange = act;
+          event = 'onchange';
+          break;
+        case 'form':
+          event = 'onsubmit';
           break;
         case 'input':
-          data.onkeyup = act;
+          event = 'onkeyup';
           if (!data.value) {
             data.value = state;
           }
           break;
         default:
-          if (type) data.onclick = act;
+          event = 'onclick';
           break;
       }
     }
-    d.selectState = '';
-    // select
-    if (subNodeCnt > 0 && _s(state).indexOf(_s(data.value)) >= 0) {
-      console.log('check select: ' + state + ' <> ' + data.value);
-      if (type == 'select') {
-        data.selected = 'selected';
-        d.selectState = 'selected="selected"';
-      }
-      if (type == 'checkbox' || type == 'radio') {
-        data.checked = 'checked';
-        d.selectState = 'checked="checked"';
+    // override
+    if (data._e_) {
+      event = 'on' + data._e_;
+    }
+    var act = prefix + '.updateState(this)';
+    parsedData.act = act;
+    if (event) {
+      attrs.push(event + '="' + act + '"');
+    }
+    // now, all other data should be outside for replacing if _, and those without, is in attrs
+    for (var i in data) {
+      var v = data[i];
+      if (typeof v !== 'object') {
+        // rule: all custom variables must start with _, others will be treated as attributes
+        if (i.indexOf('_') < 0) {
+          attrs.push(i + '="' + v + '"');
+        }
+        // just directly put in the data attrs
+        parsedData[i] = v;
+      } else {
+        // a new miniparser again...
+        var tmp = [];
+        for (var vi in v) {
+          if (v._e_) {
+            tmp.push('on' + v._e_ + '="' + act + '"');
+          } else {
+            if (vi.indexOf('_') < 0) {
+              tmp.push(vi + '="' + v[vi] + '"');
+            } else {
+              // underscore _foo goes to parent
+              parsedData[vi] = v[vi];
+            }
+          }
+        }
+        // compose
+        parsedData['attr-' + i] = tmp.join(' ');
       }
     }
 
-    for (var i in data) {
-      d[i] = data[i];
-      // rule: all custom variables must start with _, others will be treated as attributes
-      if (i.indexOf('_') < 0) {
-        a.push(i + '="' + data[i] + '"');
+    // select attribute for items
+    if (subNodeCnt > 0 && _s(state).indexOf(_s(data.value)) >= 0) {
+      if (type == 'select') {
+        attrs.push('selected="selected"');
+      }
+      if (type == 'checkbox' || type == 'radio') {
+        attrs.push('checked="checked"');
       }
     }
-    d.attr = a.join(' ');
-    d.action = act;
-    if (elName == 'welcomeStyle') console.log('>>> parseElementData', d);
-    return d;
+    parsedData.attr = attrs.join(' ');
+    console.log(parsedData);
+    return parsedData;
   };
   /**
    * get node by elementName
