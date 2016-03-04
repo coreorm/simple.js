@@ -177,13 +177,14 @@ describe('callback', function () {
     }
   };
 
+  var called = {
+    start: 0,
+    end: 0,
+    renderStart: 0,
+    renderEnd: 0
+  };
+
   it('callback on input text change', function () {
-    var called = {
-      start: 0,
-      end: 0,
-      renderStart: 0,
-      renderEnd: 0
-    };
     app.on(SimpleAppStart, '1', function () {
       called.start += 1;
     });
@@ -205,9 +206,15 @@ describe('callback', function () {
     });
     // now trigger it
     app.updateState('textInput', v);
+  });
+
+  it('render callback: start/end', function () {
     // and app start is 1
     expect(called.start).to.equal(1);
     expect(called.end).to.equal(1);
+  });
+
+  it('render callback: will render/did render', function () {
     // call render twice
     app.data.textInput.value = 'new value';
     app.render();
