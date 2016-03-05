@@ -111,14 +111,14 @@ And they are assigned by key: `_type`.
 Name and button fields are typical single elements:
 ```
 app.template.sub = {};
-app.template.sub.name = {
+  app.template.sub.name = {
     _type: 'input',
     default: '<input {attr}>'
-};
-app.template.sub.button = {
+  };
+  app.template.sub.button = {
     _type: 'button',
     default: '<button {attr}>{_caption}</button>'
-};
+  };
 ```
 
 _Note:_ templates must conform to this rule: it needs to be one single tag (reason for this is we can then use targeted node operation to enable partial render for better performance), e.g.
@@ -133,10 +133,10 @@ The select field (title), is a wrapper element, with wrapper `<select>` and chil
 The title template:
 ```
 app.template.sub.title = {
-  _type: 'select',
-  _wrapper: ['<select {attr}>', '</select>'],
-  default: '<option value="{value}">{_label}</option>'
-}
+    _type: 'select',
+    _wrapper: ['<select {attr}>', '</select>'],
+    default: '<option {attr}>{_label}</option>'
+  };
 ```
 
 As you can see, for `wrapper` type elements, we have a `_wrapper` template which consists of wrapper open tag, and wrapper close tag, reason being that we still want to render the whole thing as a single tag; then with child templates, we may give it different styles, e.g. in our case, we use a default style for the options.
@@ -169,13 +169,14 @@ Now let's look at the data structure, first of all the easier ones: single eleme
 Now you can see they are really just key/value pairs for the template variables. And updating these will result in updating the template rendering.
   
 ```
-app.data.name = {
+  app.data.name = {
     placeholder: 'enter you name',
     title: 'name'
-};
-app.data.button = {
+  };
+  app.data.button = {
+    type: 'button',
     _caption: 'submit'
-};
+  };
 ```
 
 #### 3.2 wrapper element.
@@ -188,30 +189,30 @@ Wrapper element data structure contains 2 parts:
 app.data.title = {
     wrapper: {},
     element: [
-      {
-        value: 'mister',
-        _label: 'Mr.'
-      },
-      {
-        value: 'miss',
-        _label: 'Ms.'
-      },
-      {
-        value: 'missus',
-        _label: 'Mrs.'
-      },
-      {
-        value: 'master',
-        _label: 'Mr.'
-      },
-      {
-        value: 'doctor',
-        _label: 'Dr.'
-      },
-      {
-        value: 'saint',
-        _label: 'St.'
-      }
+     {
+       value: 'mister',
+       _label: 'Mr.'
+     },
+     {
+       value: 'miss',
+       _label: 'Ms.'
+     },
+     {
+       value: 'missus',
+       _label: 'Mrs.'
+     },
+     {
+       value: 'master',
+       _label: 'Mr. (Master)'
+     },
+     {
+       value: 'doctor',
+       _label: 'Dr.'
+     },
+     {
+       value: 'saint',
+       _label: 'St.'
+     }
     ]
 };
 ```
@@ -256,3 +257,18 @@ app.on(SimpleAppStateIsUpdated, 'button', function () {
 ```
 
 And that's it! Now go to the [examples](#example) page for more examples, or the api [guide page](/simple.js/docs) for the complete documentation.
+
+### Advanced
+
+Wow you are still here! Good on ya! Now here's how you can ensure the initial state of dropdown/checkbox/whatever can be preset, in this example, we have our `title` value saved in the app state, and if we want to make sure it's preselected with the right value, it's a simple callback away:
+
+```
+  app.on(SimpleAppWillRender, 'default', function () {
+    app.data.title.element.map(function (item) {
+      if (item.value === app.state.title) {
+        item.selected = 'selected';
+      }
+    });
+  });
+```
+As you can see, it's simply iterating through the title elements and check if one of them is the same as what's saved in the state, then add a new attribute: `checked="checked"` to it.
