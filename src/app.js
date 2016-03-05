@@ -158,7 +158,6 @@ app = function (name, cnf) {
     wrd: {},
     drd: {},
     rde: {},
-    ped: {},
     siu: {}
   };
 
@@ -466,11 +465,10 @@ app = function (name, cnf) {
    * @returns {{}}
    */
   this.parseElementData = function (elName, state, data, type, subNodeCnt) {
+    // name to default - this is for inputs with names
+    if (!data.name) data.name = elName;
     var attrs = [], parsedData = {};
     if (!data) data = {};
-    // check if callback is registered
-    var c = this.getCallback('ped', elName);
-    if (typeof c == 'function') return c(state, data);
     if (subNodeCnt > 0) {
       attrs.push('data-index="' + (subNodeCnt - 1) + '"');
       if (type != 'select') {
@@ -495,6 +493,10 @@ app = function (name, cnf) {
       event = 'on' + data._e_;
     }
     var act = prefix + '.updateState(this)';
+    // event is not for options. thus
+    if (type == 'select' & subNodeCnt > 0) {
+      event = null;
+    }
     if (event) {
       parsedData.act = act;
       attrs.push(event + '="' + act + '"');
@@ -560,9 +562,10 @@ app = function (name, cnf) {
         parsedData[secKey] = tmp.join(' ');
       }
     }
-    // removed: state for selected item - do it yourself
+    // removed default attr for selected/checked
     console.log('=> Parsed Data:', parsedData);
     parsedData.attr = attrs.join(' ');
+    // finally, return it
     return parsedData;
   };
   /**
