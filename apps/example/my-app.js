@@ -25,7 +25,7 @@
   app.template.sub.title = {
     _type: 'select',
     _wrapper: ['<select {attr}>', '</select>'],
-    default: '<option value="{value}">{_label}</option>'
+    default: '<option {attr}>{_label}</option>'
   };
 
   // 3. provide data
@@ -68,11 +68,18 @@
       }
     ]
   };
+  // before render
+  app.on(SimpleAppWillRender, 'default', function () {
+    app.data.title.element.map(function (item) {
+      if (item.value === app.state.title) {
+        item.selected = 'selected';
+      }
+    });
+  });
 
   // render to div: example 1 and force render
   app.init(document.getElementById('example1'), false);
   app.render(true);
-
   // finally: callbacks
   app.on(SimpleAppStateIsUpdated, 'button', function () {
     alert('current state: ' + app.toQuerystring());

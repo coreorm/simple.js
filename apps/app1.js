@@ -3,7 +3,7 @@
  */
 (function () {
   var app = SimpleApp('app1', {
-    localStorageRead: false
+    localStorageRead: true
   });
 
   app.data = {
@@ -12,33 +12,40 @@
       _link: src('apps/app1.js')
     },
     bg: {
+      wrapper:{
+        name: 'bg'
+      },
       element: [{
-        label: 'default',
+        _label: 'default',
         value: '#FFF'
       }, {
-        label: 'color 1',
+        _label: 'color 1',
         value: '#A59477'
       }, {
-        label: 'color 2',
+        _label: 'color 2',
         value: '#f896d8'
       }, {
-        label: 'color 3',
+        _label: 'color 3',
         value: '#CEBE98'
       }, {
-        label: 'color 4',
+        _label: 'color 4',
         value: '#CCC'
       }, {
-        label: 'color 5',
+        _label: 'color 5',
         value: '#DAEAC7'
       }]
     },
     welcomeStyle: {
       element: [{
-        label: 'default &nbsp;',
-        value: 'default'
+        radioBtn: {
+          _label: 'styled &nbsp;',
+          value: 'default'
+        }
       }, {
-        label: 'plain text ',
-        value: 'plain'
+        radioBtn: {
+          _label: 'plain text ',
+          value: 'plain'
+        }
       }]
     },
     welcomeText: {
@@ -75,13 +82,16 @@
       _type: 'select',
       // special input such as SELECT can have a wrapper, or think <tr></tr>, etc.
       _wrapper: ['<label>Set page background: <select {attr}>', '</select></label>'],
-      default: '<option {attr}>{label}</option>'
+      default: '<option {attr}>{_label}</option>'
     },
     welcomeStyle: {
-      _type: 'radio',
       _wrapper: ['<span>Change render style: ', '</span>'],
-      default: '<label id="{id}"><input name="{name}" {selectState} value="{value}" ' +
-      'type="radio" onclick="{action}"> {label} </label>'
+      _sects: {
+        radioBtn: {
+          _type: 'radio'
+        }
+      },
+      default: '<label {attr}><input {attr-radioBtn} type="radio"> {_label} </label>'
     },
     welcomeText: {
       // all text input are type: input
@@ -93,6 +103,25 @@
       default: '<button {attr}>{caption}</button>'
     }
   };
+
+  // before app renders, decide which style it is.
+  app.on(SimpleAppWillRender, 'verifystyle', function () {
+    // welcome style default
+    app.data.welcomeStyle.element.map(function (item) {
+      if (item.radioBtn.value == app.state.welcomeStyle) {
+        item.radioBtn.checked='checked';
+      } else {
+        delete item.radioBtn.checked;
+      }
+    });
+    // bg default
+    app.data.bg.element.map(function (item) {
+      if (item.value == app.state.bg) {
+        item.selected = 'selected';
+        console.log(item, app.state.bg);
+      }
+    })
+  });
 
   // capture sumbit in state update
   app.on(SimpleAppStateIsUpdated, 'submit', function () {
