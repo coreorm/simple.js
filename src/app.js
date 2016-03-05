@@ -158,7 +158,6 @@ app = function (name, cnf) {
     wrd: {},
     drd: {},
     rde: {},
-    ped: {},
     siu: {}
   };
 
@@ -221,7 +220,6 @@ app = function (name, cnf) {
       value = valueOrNull;
       this.state[elementOrName] = valueOrNull;
     } else if (typeof elementOrName == 'object' && typeof elementOrName.nodeName == 'string') {
-      console.log('=> update state by element', elementOrName);
       // must be object
       el = elementOrName;
       var nodeName = el.nodeName;
@@ -229,7 +227,7 @@ app = function (name, cnf) {
       if (nodeName == 'SELECT') {
         type = 'select';
       }
-      name = el.name;
+      name = el.dataset.name ? el.dataset.name : el.name;
       value = el.value;
       switch (type) {
         case 'select':
@@ -252,6 +250,10 @@ app = function (name, cnf) {
             }
           }
           break;
+        case 'button':
+        case 'form':
+          // do not set state for button/form - just notify state is updated.
+          break;
         default:
           this.state[name] = value;
           break;
@@ -259,12 +261,25 @@ app = function (name, cnf) {
     }
     // save local if necessary
     this.store();
+    // get current data (by index/name if possible)
+    var data = this.data[name], dataset = {};
+    if (el && typeof el.dataset === 'object') {
+      dataset = el.dataset;
+      // find data...
+      if (typeof data === 'object' && typeof data.element === 'object' && dataset.index) {
+        data = data.element[dataset.index];
+      }
+    }
+    console.log('Update obj: ', el, ' data: ', data);
     // notify callback
     this.stateIsUpdated({
       name: name,
       value: value,
       element: el,
-      state: this.state
+      // double check as el may not exist - we can just call updateState(k,v) from anywhere, really
+      dataset: dataset,
+      state: this.state,
+      data: data
     });
   };
   /**
@@ -375,73 +390,183 @@ app = function (name, cnf) {
     return prefix + '_el_' + elName;
   };
   /**
+   * get current type of event
+   * @param type
+   * @returns {*}
+   */
+  this.getEvent = function (type) {
+    if (!type || type === '') return;
+    if (type === 'select') return 'onchange';
+    if (type === 'form') return 'onsubmit';
+    if (type === 'input') return 'onkeyup';
+    return 'onclick';
+  };
+  /**
    * callback: custom data parser
+   * new logic:
+   * data will be 2 types:
+   * 1. single (1 level). e.g. {foo: 'bar'} - this requires no `{attr-[name]}` type tags in template
+   * 2. multi (2 levels). e.g. {element: {foo: 'bar'}, element2: {foo: 'bar2'}}, and this requires `{attr-[name]}` template
+   * 3. system reserved data keys (use these keys to define preferred action):
+   *  3.1 _e_: the event - use keyup, keydown, change, click, select, etc. default is click.
+   *  3.2 _n_: the element name - used for look up, this will endup in data-name
+   *  3.3. _i_: the index (for wrap element only), this will endup in data-index
+   *  and the above 2 are used for system node lookup only (for state update)
+   * 4. keys starts with '_' will be ignored in the template, but stateIsUpdated callback will pass it in.
+   * 5. all other keys will be used in attr (so you still may pass class, id, title, style, etc).
+   *
+   * Example:
+   * single type:
+   * ```
+   * app.template.sub.foo = '<input name="foo" {attr}>';
+   * app.data.foo = {
+   *  _e_: 'keyup' // custom action when no type is specified
+   * }
+   * ```
+   * wrapper type:
+   * ```
+   * app.template.sub.foo = {
+   *  _wrapper: ['<ul name="foo" {attr}>', '</ul>'],
+   *  default: '<li {attr}><input type="checkbox" {attr-check}><label>{_lbl}</label></li>'
+   * }
+   * app.data.foo = {
+   *  wrapper: {class: 'list'},
+   *  element: [
+   *  {
+   *    class: 'list-normal',
+   *    _lbl: 'first item',
+   *    check: {
+   *      _e_: 'click',
+   *      class: 'checkbox-normal'
+   *    }
+   *  },
+   *  {
+   *    class: 'list-normal',
+   *    _lbl: 'Second item',
+   *    check: {
+   *      _e_: 'click',
+   *      class: 'checkbox-special'
+   *    }
+   *  }
+   *  ]
+   * }
+   * ```
+   * So system will pickup the stuff automatically from template and data, and it will
+   * 1. first, generate unique id for the first item (so {attr} must still be there)
+   * 2. find the sub section and generate the {attr-section} for the subs
+   *
+   * The event: event will be figured out by given _type, otherwise _e_ will always override it
+   *
    * @param {string} elName
    * @param {object} state
    * @param {object} data
-   * @param {string} type
+   * @param {string} type (this is when there's only 1 sub type in there - if more, it will then use sub sections _e_)
    * @param {int} [subNodeCnt=0] if > 0, it's a sub node
    * @returns {{}}
    */
   this.parseElementData = function (elName, state, data, type, subNodeCnt) {
+    // name to default - this is for inputs with names
+    if (!data.name) data.name = elName;
+    var attrs = [], parsedData = {};
     if (!data) data = {};
-    // check if callback is registered
-    var c = this.getCallback('ped', elName);
-    if (typeof c == 'function') return c(state, data);
-    // prepare with attributes, allowed list (+ wildcar 'data-*', 'on*'):
-    var d = {}, a = [];
-    data.name = elName;
-
     if (subNodeCnt > 0) {
+      attrs.push('data-index="' + (subNodeCnt - 1) + '"');
       if (type != 'select') {
         if (!data.id) data.id = this.eId(elName + '_' + subNodeCnt);
       }
     } else {
       if (!data.id) data.id = this.eId(elName);
     }
+    // only one single id, ever
+    parsedData.id = data.id;
     // generate on[change] by type
+    var event = this.getEvent(type);
+    if (type == 'input' && !data.value) {
+      data.value = state;
+      // build attr for these things
+      attrs.push('data-name="' + elName + '"');
+      attrs.push('name="' + elName + '"');
+      attrs.push('data-state="' + state + '"');
+    }
+    // override
+    if (data._e_) {
+      event = 'on' + data._e_;
+    }
     var act = prefix + '.updateState(this)';
-    if (!subNodeCnt) {
-      switch (type) {
-        case 'select':
-          data.onchange = act;
-          break;
-        case 'input':
-          data.onkeyup = act;
-          if (!data.value) {
-            data.value = state;
-          }
-          break;
-        default:
-          if (type) data.onclick = act;
-          break;
-      }
+    // event is not for options. thus
+    if (type == 'select' & subNodeCnt > 0) {
+      event = null;
     }
-    d.selectState = '';
-    // select
-    if (subNodeCnt > 0 && _s(state).indexOf(_s(data.value)) >= 0) {
-      console.log('check select: ' + state + ' <> ' + data.value);
-      if (type == 'select') {
-        data.selected = 'selected';
-        d.selectState = 'selected="selected"';
-      }
-      if (type == 'checkbox' || type == 'radio') {
-        data.checked = 'checked';
-        d.selectState = 'checked="checked"';
-      }
+    if (event) {
+      parsedData.act = act;
+      attrs.push(event + '="' + act + '"');
     }
-
+    // now, all other data should be outside for replacing if _, and those without, is in attrs
     for (var i in data) {
-      d[i] = data[i];
-      // rule: all custom variables must start with _, others will be treated as attributes
-      if (i.indexOf('_') < 0) {
-        a.push(i + '="' + data[i] + '"');
+      var v = data[i];
+      if (typeof v !== 'object') {
+        // rule: all custom variables must start with _, others will be treated as attributes
+        if (i.indexOf('_') < 0) {
+          attrs.push(i + '="' + v + '"');
+        }
+        // just directly put in the data attrs
+        parsedData[i] = v;
       }
     }
-    d.attr = a.join(' ');
-    d.action = act;
-    if (elName == 'welcomeStyle') console.log('>>> parseElementData', d);
-    return d;
+    // we'll find the template definition and create attributes for sections, if any.
+    var template = this.template.sub[elName];
+    if (typeof template._sects === 'object') {
+      // create mini attrs
+      for (var sectName in template._sects) {
+        var tmp = [];
+        // let's get the sects out from data
+        var secKey = 'attr-' + sectName;
+        var secData = (typeof data[sectName] === 'object') ? data[sectName] : {};
+        // merge with template data
+        var setting = template._sects[sectName];
+        if (typeof setting === 'object') {
+          for (var si in setting) {
+            secData[si] = setting[si];
+          }
+          // type select
+          if (setting._type) {
+            var eS = this.getEvent(setting._type);
+            if (eS) {
+              tmp.push(eS + '="' + act + '"');
+            }
+          }
+          // data action
+          if (setting._action) {
+            tmp.push('data-action="' + setting._action + '"');
+          }
+        }
+        // setting has _e_?
+        if (secData._e_) {
+          tmp.push('on' + secData._e_ + '="' + act + '"');
+        }
+        for (var vi in secData) {
+          if (vi.indexOf('_') < 0) {
+            tmp.push(vi + '="' + secData[vi] + '"');
+          } else {
+            // underscore _foo goes to parent
+            parsedData[vi] = secData[vi];
+          }
+        }
+        // add index
+        tmp.push('data-name="' + elName + '"');
+        tmp.push('name="' + elName + '"');
+        if (subNodeCnt > 0) {
+          tmp.push('data-index="' + (subNodeCnt - 1) + '"');
+        }
+        // compose
+        parsedData[secKey] = tmp.join(' ');
+      }
+    }
+    // removed default attr for selected/checked
+    console.log('=> Parsed Data:', parsedData);
+    parsedData.attr = attrs.join(' ');
+    // finally, return it
+    return parsedData;
   };
   /**
    * get node by elementName
@@ -568,13 +693,15 @@ app = function (name, cnf) {
       var wAttr = this.parseElementData(elName, state, data.wrapper, t._type), elData = data.element || [], m = 0;
       // check prevData to ensure rendering take advantage of vNode or innerHTML
       var tmpData = this.pData[elName];
-      var prevElementData = [];
+      var prevElementData = [], isInitialRun = false;
       if (!tmpData) {
         // render all
         forceRender = true;
       } else {
         prevElementData = _c(tmpData.element);
+        isInitialRun = (prevElementData.length === 0);
       }
+
       // loop and remove
       var nodeParent = false;
       elData.map(function (item) {
@@ -594,12 +721,12 @@ app = function (name, cnf) {
 
         // retreive node
         // 1st. if not partial, or force render, keep adding to it
-        if (self.cnf.partialRender && !forceRender) {
+        if (self.cnf.partialRender && !forceRender && !isInitialRun) {
           // logic - data less or more?
           var n = m - 1, before = self.pData[elName].element[n], after = self.data[elName].element[n], src = null;
           // fix parent before comparing...
           var node = self.node(elName + '_' + m);
-          if (!nodeParent) nodeParent = node.parentNode;
+          if (!nodeParent && node) nodeParent = node.parentNode;
           if (_s(before) == _s(after)) {
             // nothing is changed, do not render
             return;
@@ -611,11 +738,13 @@ app = function (name, cnf) {
             if (node) {
               if (src) {
                 vn = new vNode(src, nodeParent);
+                console.log('Replace: ' + src + ' with: ', node);
                 vn.replace(node);
               }
             } else {
               // add some more to it
               if (nodeParent) {
+                console.log('Append: ' + src + ' to: ' + nodeParent.id);
                 vn = new vNode(src, nodeParent);
                 vn.right();
               } else {
@@ -633,16 +762,16 @@ app = function (name, cnf) {
       if (nodeParent && prevElementData.length > elData.length) {
         prevElementData.map(function (el, item) {
             if (item >= m) {
-              var node = self.node(elName + '_' + item);
+              var node = self.node(elName + '_' + (item + 1));
               // remove childnode
-              console.log('Remove child: ' + item);
+              console.log('Remove child: ' + item + ' from: ' + nodeParent.id);
               if (node) nodeParent.removeChild(node);
             }
           }
         );
       }
-
-      if (typeof output == 'string' && output.length > 1) {
+      // if m === 0 means there's no item, so just render the shell
+      if ((typeof output == 'string' && output.length > 1) || m === 0) {
         output = self.htpl(t._wrapper[0], wAttr) + output + t._wrapper[1];
       } else {
         // stop here as it's replaced
@@ -671,6 +800,7 @@ app = function (name, cnf) {
     }
     // 2nd - it must be partial and if node doesn't exists, return itself, otherwise, update by replacing node
     if (!forceRender && this.cnf.partialRender === true && output) {
+      // so initial run will fall here too
       var node = this.node(elName), nn = null;
       // replace
       if (node) {
