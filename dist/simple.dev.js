@@ -472,10 +472,6 @@ app = function (name, cnf) {
     // check if callback is registered
     var c = this.getCallback('ped', elName);
     if (typeof c == 'function') return c(state, data);
-    // build attr
-    attrs.push('data-name="' + elName + '"');
-    attrs.push('data-state="' + state + '"');
-
     if (subNodeCnt > 0) {
       attrs.push('data-index="' + (subNodeCnt - 1) + '"');
       if (type != 'select') {
@@ -490,6 +486,10 @@ app = function (name, cnf) {
     var event = this.getEvent(type);
     if (type == 'input' && !data.value) {
       data.value = state;
+      // build attr for these things
+      attrs.push('data-name="' + elName + '"');
+      attrs.push('name="' + elName + '"');
+      attrs.push('data-state="' + state + '"');
     }
     // override
     if (data._e_) {
@@ -553,6 +553,7 @@ app = function (name, cnf) {
         }
         // add index
         tmp.push('data-name="' + elName + '"');
+        tmp.push('name="' + elName + '"');
         if (subNodeCnt > 0) {
           tmp.push('data-index="' + (subNodeCnt - 1) + '"');
         }
@@ -560,17 +561,7 @@ app = function (name, cnf) {
         parsedData[secKey] = tmp.join(' ');
       }
     }
-
-
-    // select attribute for items
-    if (subNodeCnt > 0 && _s(state).indexOf(_s(data.value)) >= 0) {
-      if (type == 'select') {
-        attrs.push('selected="selected"');
-      }
-      if (type == 'checkbox' || type == 'radio') {
-        attrs.push('checked="checked"');
-      }
-    }
+    // removed: state for selected item - do it yourself
     console.log('=> Parsed Data:', parsedData);
     parsedData.attr = attrs.join(' ');
     return parsedData;
