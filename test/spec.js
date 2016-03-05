@@ -17,7 +17,6 @@ describe("Localstorage Test", function () {
     app.state = {};
     // load and make sure v is not in
     app.load();
-    console.log(app.state);
     expect(app.state[k]).to.be.undefined;
   });
 

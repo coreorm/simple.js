@@ -222,7 +222,6 @@ app = function (name, cnf) {
       value = valueOrNull;
       this.state[elementOrName] = valueOrNull;
     } else if (typeof elementOrName == 'object' && typeof elementOrName.nodeName == 'string') {
-      console.log('=> update state by element', elementOrName);
       // must be object
       el = elementOrName;
       var nodeName = el.nodeName;
@@ -264,14 +263,25 @@ app = function (name, cnf) {
     }
     // save local if necessary
     this.store();
+    // get current data (by index/name if possible)
+    var data = this.data[name], dataset = {};
+    if (el && typeof el.dataset === 'object') {
+      dataset = el.dataset;
+      // find data...
+      if (typeof data === 'object' && typeof data.element === 'object' && dataset.index) {
+        data = data.element[dataset.index];
+      }
+    }
+    console.log('Update obj: ', el, ' data: ', data);
     // notify callback
     this.stateIsUpdated({
       name: name,
       value: value,
       element: el,
       // double check as el may not exist - we can just call updateState(k,v) from anywhere, really
-      dataset: (el && typeof el.dataset === 'object') ? el.dataset : {},
-      state: this.state
+      dataset: dataset,
+      state: this.state,
+      data: data
     });
   };
   /**
@@ -735,11 +745,13 @@ app = function (name, cnf) {
             if (node) {
               if (src) {
                 vn = new vNode(src, nodeParent);
+                console.log('Replace: ' + src + ' with: ', node);
                 vn.replace(node);
               }
             } else {
               // add some more to it
               if (nodeParent) {
+                console.log('Append: ' + src + ' to: ' + nodeParent.id);
                 vn = new vNode(src, nodeParent);
                 vn.right();
               } else {
@@ -757,9 +769,9 @@ app = function (name, cnf) {
       if (nodeParent && prevElementData.length > elData.length) {
         prevElementData.map(function (el, item) {
             if (item >= m) {
-              var node = self.node(elName + '_' + item);
+              var node = self.node(elName + '_' + (item + 1));
               // remove childnode
-              console.log('Remove child: ' + item);
+              console.log('Remove child: ' + item + ' from: ' + nodeParent.id);
               if (node) nodeParent.removeChild(node);
             }
           }
