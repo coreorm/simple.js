@@ -4,13 +4,7 @@
  */
 (function () {
   var app = SimpleApp('todo-list');
-  app.template.main.default = '<section class="panel tasks-widget panel-primary">' +
-    '<header class="panel-heading">Todo list</header>  ' +
-    '<div class="panel-body">' +
-    '<div class="task-content">{list}</div>' +
-    '<div class=" add-task-row">{btnAdd}{itemEntry}</div></div>' +
-    '</section>';
-
+  app.template.main.default = '<section class="panel tasks-widget panel-primary"><header class="panel-heading">Todo list</header><div class="panel-body"><div class="task-content">{list}</div><div class=" add-task-row">{btnAdd}{itemEntry}</div></div></section>';
   app.template.sub = {
     itemEntry: {
       _type: 'input',
@@ -33,15 +27,9 @@
           _action: 'done'
         }
       },
-      default: '<li {attr}><div class="task-checkbox"><input type="checkbox" class="list-child" {attr-done}></div>' +
-      '<div class="task-title"><span class="task-title-sp">{_lbl}</span>' +
-      '<div class="pull-right">' +
-      '<button class ="btn btn-danger btn-xs" {attr-trash}>trash</button>' +
-      '</div></div>' +
-      '</li>'
+      default: '<li {attr}><div class="task-checkbox"><input type="checkbox" class="list-child" {attr-done}></div><div class="task-title"><span class="task-title-sp">{_lbl}</span><div class="pull-right"><button class ="btn btn-danger btn-xs" {attr-trash}>trash</button></div></div></li>'
     }
   };
-
   app.data = {
     btnAdd: {
       _lbl: 'Add'
@@ -56,7 +44,6 @@
       element: []
     }
   };
-
   /* the little storage thingy */
   var itemsKey = 'data-todo-items';
   // little thing to store in localstorage
@@ -74,7 +61,6 @@
     removeItem = function (index) {
       delete app.state[itemsKey].cache[index];
     };
-
   // use app will render to check the current state
   app.on(SimpleAppWillRender, 'loadState', function () {
     // we load the state here and do render
@@ -104,25 +90,18 @@
     }
     // ^ really that's just it, no need for anything more
   });
-
-
   app.init(document.getElementById('apps'), false);
   app.render(true);
-
   // callback: add item
   app.on(SimpleAppStateIsUpdated, 'btnAdd', function (obj) {
     if (app.state.itemEntry.length > 0) {
-      // add to state storage
       addItem(app.state.itemEntry);
-      // store in local storage
       app.store();
-      // render app
       app.render();
     } else {
       alert('Please enter the item entry');
     }
   });
-
   app.on(SimpleAppStateIsUpdated, 'list', function (obj) {
     if (!obj.dataset.action || !obj.dataset.name || !obj.dataset.index) return;  // no action
     switch (obj.dataset.action) {
@@ -139,5 +118,4 @@
         break;
     }
   });
-
 })();
