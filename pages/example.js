@@ -45,6 +45,12 @@
       _hdr: _src('Example Two: table.js', 'apps/example/table.js'),
       _desc: '<p>Dynamically generated table with lightning fast targetted cell update</p>',
       exampleId: 'table'
+    },
+    {
+      class: _css('example3'),
+      _hdr: _src('Example Three: todo.js', 'apps/example/todo.js'),
+      _desc: '<p>Every framework/library needs a todo list app right? This one is no different - but it\'s only 120 lines of code includes templates and comments (without those, it\'s less than 60 lines of code...)!</p>',
+      exampleId: 'todo'
     }
   ];
 

@@ -48,7 +48,7 @@
       if (!loadedCSS[src]) {
         var s = document.createElement('link');
         s.setAttribute("rel", "stylesheet");
-        s.setAttribute("href", src);
+        s.setAttribute("href", src + '?d=' + Date.now());
         document.head.appendChild(s);
         loadedCSS[src] = s;
         console.log('style: ' + src + ' is loaded');
