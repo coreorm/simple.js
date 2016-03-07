@@ -1,7 +1,3 @@
-/**
- * todo app
- * use advanced features
- */
 (function () {
   // load new css
   loadCss('theme/todo.css');
@@ -30,7 +26,8 @@
           _action: 'done'
         }
       },
-      default: '<div {attr}><input class="todo--checkbox" type="checkbox" {attr-done}><label>{_lbl}</label> <button class="pull-right btn btn-danger btn-xs" {attr-trash}>trash</button></div>'
+      default: '<div {attr} class="todo--item"><input class="todo--checkbox" type="checkbox" {attr-done}><label>{_lbl}</label> ' +
+      '<button class="pull-right btn btn-danger btn-xs" {attr-trash}>trash</button></div>'
     }
   };
   app.data = {
@@ -94,12 +91,12 @@
   app.render(true);
   // callback: add item
   app.on(SimpleAppStateIsUpdated, 'btnAdd', function (obj) {
-    if (app.state.itemEntry.length > 0) {
+    if (app.state.itemEntry && app.state.itemEntry.length > 0) {
       addItem(app.state.itemEntry);
       app.store();
       app.render();
     } else {
-      alert('Please enter the item entry');
+      alert('Please type something');
     }
   });
   // callback: done or trash

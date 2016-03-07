@@ -272,3 +272,5 @@ Wow you are still here! Good on ya! Now here's how you can ensure the initial st
   });
 ```
 As you can see, it's simply iterating through the title elements and check if one of them is the same as what's saved in the state, then add a new attribute: `checked="checked"` to it.
+
+Now, for more advanced stuff, make sure you checkout [Advanced Usage](#advanced) for more details.

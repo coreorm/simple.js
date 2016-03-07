@@ -21,6 +21,11 @@
           title: 'getting started'
         },
         {
+          href: '#advanced',
+          label: 'Advanced Usage',
+          title: 'Advanced usage'
+        },
+        {
           href: 'docs/',
           label: 'API Guide',
           title: 'API Guide'
