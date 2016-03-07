@@ -7,6 +7,14 @@
 * Small & nimble: before gzip, it's only 7K, and can be included in page source to save one extra network connection.
 * Fast: Render a complete 100x100 table under 1 second (on my 9 year old imac), and updating individual cells under 5 ms.
 
+## install
+
+### manually install
+download the latest release and manually include in your js directory, or
+
+### use bower
+`bower install simple.js`
+
 ## What can you do with it?
 
 * Web apps: Apps are setup independently, yet still able to communicate with each other.
