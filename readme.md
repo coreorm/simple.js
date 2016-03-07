@@ -13,7 +13,7 @@
 download the latest release and manually include in your js directory, or
 
 ### use bower
-`bower install simple.js`
+`bower install simplejs`
 
 ## What can you do with it?
 
