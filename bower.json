@@ -23,6 +23,10 @@
     "node_modules",
     "bower_components",
     "test",
+    "html",
+    "src",
+    "*.json",
+    "**/*.md",
     "tests"
   ]
 }
