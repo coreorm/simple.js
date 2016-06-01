@@ -66,7 +66,7 @@ and this is where you may choose to execute your own codes, or re-render the vie
 - run `npm run server` to start the web server so you may access a local `localhost:8080/dist/simple.dev.js`
 
 ## client side test Guides
-- get phantomJS
+- get phantomJS (http://phantomjs.org/download.html)
 - run `npm install -g mocha-phantomjs`
 - run `npm install mocha -g;npm install chai -g` for unit/client-side test
 - run `mocha-phantomjs test/app.html` to start the test
